@@ -1,0 +1,10 @@
+deps 
+sudo cabal install stm
+sudo cabal install xhtml
+
+sudo apt-get install libgd2-xpm-dev php5-gd libjpeg62-dev zlib1g libpng3
+sudo cabal install gd
+sudo cabal install cgi
+
+compile
+ghc --make hImgB.hs -o index.cgi
