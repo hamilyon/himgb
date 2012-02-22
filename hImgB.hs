@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fbang-patterns #-}
+{-# LANGUAGE BangPatterns #-}
 module Main where
 
 import Network.CGI
@@ -172,11 +172,10 @@ compute fn = compute_ (5*10^6) fn >> return ()
 
 main :: IO ()
 main = runCGI (handleErrors imgb)
- 
+
 imgb :: CGI CGIResult
 imgb = do
     args    <- liftIO getArgs
-
     efile   <- liftIO $ openFile "stateh" ReadWriteMode
     idx     <- liftM  (maybe               "" id) $ getInput "id"
     text    <- liftM  (maybe        "silence" id) $ getInput "txt"
@@ -204,7 +203,7 @@ imgb = do
             if B.null bslfile
               then fail "must supply image with new threads"
               else do liftIO $ do
-                        let img = "src/"++time++ftype
+                        let img = "img/"++time++ftype
                         B.writeFile img bslfile
                         compute $ makethumb img
                         let nt = newThread hst (mkPost
@@ -223,7 +222,7 @@ imgb = do
                               let nt = addPost' hst (read idx) (mkPost
                                         name  Nothing  time  text)
                               overwriteConfig efile nt
-                      else do let img = "src/"++time++ftype
+                      else do let img = "img/"++time++ftype
                               B.writeFile img bslfile
                               compute $ makethumb img
                               let nt = addPost' hst (read idx) (mkPost
