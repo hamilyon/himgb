@@ -1,5 +1,5 @@
-{-# LANGUAGE BangPatterns #-}
-module Himgb where
+{-# OPTIONS_GHC -fbang-patterns #-}
+module Admin where
 
 import Network.CGI
 import Graphics.GD
@@ -170,8 +170,8 @@ compute fn = compute_ (5*10^6) fn >> return ()
 
 -- ------------------------------------------------------------------------
 
-hmain :: IO ()
-hmain = runCGI (handleErrors imgb)
+main :: IO ()
+main = runCGI (handleErrors imgb)
 
 imgb :: CGI CGIResult
 imgb = do
@@ -203,7 +203,7 @@ imgb = do
             if B.null bslfile
               then fail "must supply image with new threads"
               else do liftIO $ do
-                        let img = "img/"++time++ftype
+                        let img = "src/"++time++ftype
                         B.writeFile img bslfile
                         compute $ makethumb img
                         let nt = newThread hst (mkPost
@@ -222,7 +222,7 @@ imgb = do
                               let nt = addPost' hst (read idx) (mkPost
                                         name  Nothing  time  text)
                               overwriteConfig efile nt
-                      else do let img = "img/"++time++ftype
+                      else do let img = "src/"++time++ftype
                               B.writeFile img bslfile
                               compute $ makethumb img
                               let nt = addPost' hst (read idx) (mkPost
