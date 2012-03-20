@@ -1,0 +1,6 @@
+*.pyc
+*.hi
+*.o
+*.7z
+.pydevproject
+.project
