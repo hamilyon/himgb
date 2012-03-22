@@ -73,35 +73,33 @@ exact prior inference = undefined
 spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
 ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
 
-wspam = words spam_corpus
-wham  = words  ham_corpus
-
+spamClassificationData = SpamClassificationData spam_corpus ham_corpus
 
 show_off = do
-    putStr . show $ spamProb  "offer is very secret"
+    putStr . show $ spamProb spamClassificationData "offer is very secret"
 
 --spamProb :: String -> Double
 --spamProb = undefined
-spamProb ::  String -> Double
-spamProb message = en * k :: Double where
-    en = spamProb' message
-    k = 1 / ((spamProb' message) + (hamProb' message)) :: Double
+spamProb :: SpamClassificationData -> String -> Double
+spamProb spamClassificationData message = en * k :: Double where
+    en = spamProb' spamClassificationData message
+    k = 1 / ((spamProb' spamClassificationData message) + (hamProb' spamClassificationData message)) :: Double
 
-spamProb' :: String -> Double
-spamProb' s = product $ map ((flip smoothedLikelihood)  wspam) (words s)
-hamProb'  s = product $ map (flip smoothedLikelihood  wham)  (words s)
+spamProb' :: SpamClassificationData -> String -> Double
+spamProb' spamClassificationData s = product $ map ((flip smoothedLikelihood) (words $ spam spamClassificationData)) (words s)
+hamProb'  spamClassificationData s = product $ map ((flip smoothedLikelihood) (words $ ham  spamClassificationData)) (words s)
 -- hamProb'  = product $ map (smoothedLikelihood (words spam_corpus) ham_corpus  )
 
-laplaceSmoother :: Fractional a => a 
+laplaceSmoother :: Double 
 laplaceSmoother = 1
 
 count :: Fractional a =>  String -> [String] -> a
 count word corpus = fromIntegral $ length $ filter (==word) corpus
 
-prior _ = 0.5
+-- prior _ = 0.5
 
-smoothedLikelihood :: Fractional a => String -> [String]  -> a
-smoothedLikelihood word in_words = (num + laplaceSmoother) * prior in_words where
+smoothedLikelihood :: String -> [String]  -> Double
+smoothedLikelihood word in_words = (num + laplaceSmoother) where
     num = count word in_words
 
 -- total = num +

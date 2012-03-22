@@ -4,7 +4,7 @@ import Data.List
 -- import Prob1
 
 data SpamExample = SpamExample {
-    spamClassificationData :: SpamClassificationData,
+    corpus :: SpamClassificationData,
     message :: String
 }
 

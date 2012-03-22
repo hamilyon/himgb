@@ -1,20 +1,16 @@
-module Spam where
 import Test.QuickCheck
 import Data.List
--- import Prob1
+import Prob1
+import Test.QuickCheck.Batch
+import Spam
 
-data SpamExample = SpamExample {
-    spamClassificationData :: SpamClassificationData,
-    message :: String
-}
+prop_idempotent xs = qsort (qsort xs) == qsort xs
 
-data SpamClassificationData = SpamClassificationData {
-    spam :: String,
-    ham :: String
-}
-
-crp spamClassificationData = spam spamClassificationData ++ " " ++ ham spamClassificationData
-
-
--- prop_eq xs = spamProb xs == pmessagespam xs
-
+main = do
+    runTests "simple" options
+        [ run prop_empty_id
+        , run prop_char
+        , run prop_text
+        , run prop_line
+        , run prop_double
+        ]

@@ -1,3 +1,4 @@
+module Prob2 where
 import qualified Data.Map as DM
 import Text.Printf
 
