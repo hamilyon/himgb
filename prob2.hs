@@ -8,31 +8,31 @@ import Spam
 spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
 ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
 
-spamClassificationData = SpamClassificationData spam_corpus ham_corpus
+-- spamClassificationData = SpamClassificationData spam_corpus ham_corpus
 
 -- fullcorp = spam ++ " " ++ ham
-fullcorp = crp spamClassificationData
+fullcorp spamClassificationData = crp spamClassificationData
 
 -- Return a Map representing the "Bag of Words" count of all the words in the
 -- corpus.
-wordFreq :: String -> DM.Map String Float
+wordFreq :: String -> DM.Map String Double
 wordFreq corpus = DM.fromListWith (+) $ [(w, 1.0) | w <- (words corpus)]
 
 -- Count the occurrences of a word in a string.
-countWord :: String -> String -> Float
+countWord :: String -> String -> Double
 countWord s m = fromIntegral $ length $ filter (==s) $ words m
 
 -- How many unique words are there in a string?
-uniqueWords :: String -> Float
+uniqueWords :: String -> Double
 uniqueWords = fromIntegral . DM.size . wordFreq
 
 -- Parameter for Laplace smoothing.
-smoother :: Float
+smoother :: Double
 smoother = 5.0
 
 -- What is the likelihood that  is in a , given a superset
 -- of that corpus called , which is all the possible words.
-pword :: String -> String -> Float -> String -> Float
+pword :: String -> String -> Double -> String -> Double
 pword corpus fullCorpus k word = top/bottom
   where top = k + (countWord word corpus)
         bottom = (fromIntegral $ length . words $ corpus) + k*(uniqueWords fullCorpus)
@@ -40,26 +40,38 @@ pword corpus fullCorpus k word = top/bottom
 -- Use this for calculating the p(spam) and p(ham) likelihoods;
 -- i.e. a measure of how likely something is to be spam without taking
 -- into consideration the contents.
-pthing :: Float -> Float -> Float -> Float
+pthing :: Double -> Double -> Double -> Double
 pthing count total k = (count + k)/(total + k*2) -- 2 = number of classes (spam, ham)
 
 -- What is the probability that a word is spam?
-pspam :: Float
-pspam = pthing (fromIntegral . length . words $ spam) (fromIntegral . length . words $ fullcorp) smoother
+pspam :: SpamClassificationData -> Double
+pspam spamClassificationData = 
+    pthing (fromIntegral . length . words $ (spam spamClassificationData)) (fromIntegral . length . words $ (crp spamClassificationData)) (smooth_k spamClassificationData)
 
 -- What is the probability that a word is ham?
-pham :: Float
-pham = pthing (fromIntegral . length . words $ ham) (fromIntegral . length . words $ fullcorp) smoother
+pham :: SpamClassificationData -> Double
+pham spamClassificationData = 
+    pthing (fromIntegral . length . words $ (ham spamClassificationData)) (fromIntegral . length . words $ (crp spamClassificationData)) (smooth_k spamClassificationData)
 
 -- What is the probability that a message is spam?
-pmessagespam :: SpamClassificationData -> String -> Float
+pmessagespam :: SpamClassificationData -> String -> Double
 pmessagespam spamClassificationData message = top/bottom
-  where top = pspam * product pspamwords
-        pspamwords = map (pword (spam spamClassificationData) fullcorp smoother) $ words message
-        bottom = top + pham * product phamwords
-        phamwords = map (pword (ham spamClassificationData) fullcorp smoother) $ words message
+  where top = (pspam spamClassificationData) * product pspamwords
+        pspamwords = map 
+            (pword 
+                (spam spamClassificationData) 
+                (crp spamClassificationData) 
+                (smooth_k spamClassificationData))
+             $ words message
+        bottom = top + (pham spamClassificationData) * product phamwords
+        phamwords = map 
+            (pword 
+                (ham spamClassificationData) 
+                (crp spamClassificationData) 
+                (smooth_k spamClassificationData)) 
+            $ words message
 
-main = do
+{-main = do
   -- Print out some probabilities to test.
   putStrLn $ printf "p(spam) = %.9f" $ pspam
   putStrLn $ printf "p(ham) = %.9f" $ pham
@@ -78,8 +90,9 @@ main = do
 
   -- Test something that's kind of nonsensical but is probably not spam.
   let message = "i would guess wayne coyne look like a pirate"
-  putStrLn $ printf ("Message: \"" ++ message ++ "\"")
-  putStrLn $ printf "Spam probability: %.9f" $ pmessagespam message
+  putStrLn $ printf ("Message: \"" ++ message ++ "\"") 
+  putStrLn $ printf "Spam probability: %.9f" $ pmessagespam message -}
+  
 
 -- $ runhaskell spamfilter.hs
 -- p(spam) = 0.431034480
