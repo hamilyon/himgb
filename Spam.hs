@@ -10,7 +10,8 @@ data SpamExample = SpamExample {
 
 data SpamClassificationData = SpamClassificationData {
     spam :: String,
-    ham :: String
+    ham :: String,
+    smooth_k :: Double
 }
 
 crp spamClassificationData = spam spamClassificationData ++ " " ++ ham spamClassificationData

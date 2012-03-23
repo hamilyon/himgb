@@ -73,7 +73,7 @@ exact prior inference = undefined
 spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
 ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
 
-spamClassificationData = SpamClassificationData spam_corpus ham_corpus
+spamClassificationData = SpamClassificationData spam_corpus ham_corpus laplaceSmoother
 
 show_off = do
     putStr . show $ spamProb spamClassificationData "offer is very secret"
@@ -86,8 +86,17 @@ spamProb spamClassificationData message = en * k :: Double where
     k = 1 / ((spamProb' spamClassificationData message) + (hamProb' spamClassificationData message)) :: Double
 
 spamProb' :: SpamClassificationData -> String -> Double
-spamProb' spamClassificationData s = product $ map ((flip smoothedLikelihood) (words $ spam spamClassificationData)) (words s)
-hamProb'  spamClassificationData s = product $ map ((flip smoothedLikelihood) (words $ ham  spamClassificationData)) (words s)
+spamProb' spamClassificationData s = product $ map
+    (smoothedLikelihood4map
+        (words $ spam spamClassificationData)
+        (smooth_k spamClassificationData))
+    (words s)
+
+hamProb'  spamClassificationData s = product $ map
+    (smoothedLikelihood4map
+        (words $ ham  spamClassificationData)
+        (smooth_k spamClassificationData))
+    (words s)
 -- hamProb'  = product $ map (smoothedLikelihood (words spam_corpus) ham_corpus  )
 
 laplaceSmoother :: Double 
@@ -98,8 +107,11 @@ count word corpus = fromIntegral $ length $ filter (==word) corpus
 
 -- prior _ = 0.5
 
-smoothedLikelihood :: String -> [String]  -> Double
-smoothedLikelihood word in_words = (num + laplaceSmoother) where
+smoothedLikelihood4map :: [String] -> Double -> String -> Double
+smoothedLikelihood4map in_words smoother word = smoothedLikelihood word in_words smoother
+
+smoothedLikelihood :: String -> [String] -> Double -> Double
+smoothedLikelihood word in_words smoother = (num + smoother) where
     num = count word in_words
 
 -- total = num +

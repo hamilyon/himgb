@@ -2,11 +2,16 @@ module Prob2 where
 import qualified Data.Map as DM
 import Text.Printf
 
--- Some sample text.
-spam = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
-ham = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
+import Spam
 
-fullcorp = spam ++ " " ++ ham
+-- Some sample text.
+spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
+ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
+
+spamClassificationData = SpamClassificationData spam_corpus ham_corpus
+
+-- fullcorp = spam ++ " " ++ ham
+fullcorp = crp spamClassificationData
 
 -- Return a Map representing the "Bag of Words" count of all the words in the
 -- corpus.
@@ -47,12 +52,12 @@ pham :: Float
 pham = pthing (fromIntegral . length . words $ ham) (fromIntegral . length . words $ fullcorp) smoother
 
 -- What is the probability that a message is spam?
-pmessagespam :: String -> Float
-pmessagespam message = top/bottom
+pmessagespam :: SpamClassificationData -> String -> Float
+pmessagespam spamClassificationData message = top/bottom
   where top = pspam * product pspamwords
-        pspamwords = map (pword spam fullcorp smoother) $ words message
+        pspamwords = map (pword (spam spamClassificationData) fullcorp smoother) $ words message
         bottom = top + pham * product phamwords
-        phamwords = map (pword ham fullcorp smoother) $ words message
+        phamwords = map (pword (ham spamClassificationData) fullcorp smoother) $ words message
 
 main = do
   -- Print out some probabilities to test.
