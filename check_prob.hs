@@ -1,6 +1,7 @@
 import Test.QuickCheck
 import Data.List
 import Prob1
+import Prob2
 import Test.QuickCheck.Batch
 import Spam
 
@@ -9,7 +10,7 @@ ham_corpus = "based on your artwork from elementary school i would guess you dre
 spamClassificationData = SpamClassificationData spam_corpus ham_corpus 1
 
 testMessage = "offer is very secret"
-
+-- pmessagespam is reference
 prop_eq xs = spamProb spamClassificationData testMessage 1 == pmessagespam spamClassificationData testMessage 1
 
 main = do
