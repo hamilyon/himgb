@@ -5,6 +5,7 @@ module Prob1
  where
 
 import Spam
+import Data.List
 
 data HeroinStatus = User | Clean
   deriving (Show, Eq)
@@ -38,18 +39,8 @@ inference = [(User, testResult1), (Clean, testResult2)]
 exact :: Show t1 => [(HeroinStatus, t1)] -> [(HeroinStatus, [(Test, t)])] -> t1
 exact prior inference = undefined
 
-
 --main = do
 --    putStr . show $ exact heroinStatus inference
-
-
-
-
-
-
-
-
-
 
 --data KindaBayesNet = KindaBayesNet {
     --bayes_a_postrpiori :: (Evidence evidence, Fractional probability) => [Hipothesis] -> evidence -> probability,
@@ -70,13 +61,13 @@ exact prior inference = undefined
     --a_posteriori :: (Hipothesis b, Fractional c) => a -> b -> c
 
 
-spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
-ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
+spam_corpus1 = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
+ham_corpus1 = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
 
-spamClassificationData = SpamClassificationData spam_corpus ham_corpus laplaceSmoother
+spamClassificationData1 = SpamClassificationData spam_corpus1 ham_corpus1 1
 
 show_off = do
-    putStr . show $ spamProb spamClassificationData "offer is very secret"
+    putStr . show $ spamProb spamClassificationData1 "offer is very secret"
 
 --spamProb :: String -> Double
 --spamProb = undefined
@@ -86,35 +77,60 @@ spamProb spamClassificationData message = en * k :: Double where
     k = 1 / ((spamProb' spamClassificationData message) + (hamProb' spamClassificationData message)) :: Double
 
 spamProb' :: SpamClassificationData -> String -> Double
-spamProb' spamClassificationData s = product $ map
-    (smoothedLikelihood4map
-        (words $ spam spamClassificationData)
-        (smooth_k spamClassificationData))
-    (words s)
+spamProb' spamClassificationData s = (spamProbTotal spamClassificationData) * (product $ map
+    (singleWord
+        spamClassificationData spam)
+    (words s))
 
-hamProb'  spamClassificationData s = product $ map
-    (smoothedLikelihood4map
-        (words $ ham  spamClassificationData)
-        (smooth_k spamClassificationData))
-    (words s)
+hamProb'  spamClassificationData s = (hamProbTotal spamClassificationData) * (product $ map
+    (singleWord
+        spamClassificationData ham)
+    (words s))
+
 -- hamProb'  = product $ map (smoothedLikelihood (words spam_corpus) ham_corpus  )
 
-laplaceSmoother :: Double 
-laplaceSmoother = 1
-
 count :: Fractional a =>  String -> [String] -> a
-count word corpus = fromIntegral $ length $ filter (==word) corpus
+count word corpus = countall $ filter (==word) corpus
 
+countall :: Fractional a => [String] -> a
+countall = fromIntegral . length 
 -- prior _ = 0.5
+
+psmoothed :: String -> [String] -> Double -> Double
+psmoothed word in_words smoother = psmoothed' (count word in_words) (countall in_words) smoother
+
+psmoothed' :: Double -> Double -> Double -> Double
+psmoothed' word in_words smoother = (c + smoother) / (d + 2*smoother) where
+    c = word
+    d = in_words
 
 smoothedLikelihood4map :: [String] -> Double -> String -> Double
 smoothedLikelihood4map in_words smoother word = smoothedLikelihood word in_words smoother
 
 smoothedLikelihood :: String -> [String] -> Double -> Double
-smoothedLikelihood word in_words smoother = (num + smoother) where
-    num = count word in_words
+smoothedLikelihood = psmoothed
+    --(num + smoother) / countall in_words where
+    --num = count word in_words 
+
+spamProbTotal :: SpamClassificationData -> Double
+spamProbTotal spamClassificationData = 
+    psmoothed' (countall (words $ spam spamClassificationData)) 
+        (countall (words $ crp spamClassificationData)) 
+        (smooth_k spamClassificationData)
+
+hamProbTotal spamClassificationData = 
+    psmoothed' (countall (words $ ham spamClassificationData)) 
+        (countall (words $ crp spamClassificationData)) 
+        (smooth_k spamClassificationData)
+
+singleWord :: SpamClassificationData -> (SpamClassificationData -> String) -> String -> Double
+singleWord spamClassificationData field word = nom/den
+  where nom = smooth_k spamClassificationData + (count word ((words . field) spamClassificationData))
+        den = ((countall . words . field) spamClassificationData) + (smooth_k spamClassificationData) *  
+            ((fromIntegral . length . nub . words) $ crp spamClassificationData)
+
 
 -- total = num +
 -- / (total + laplaceSmoother * classes)
 
-main = show_off
+-- main = show_off

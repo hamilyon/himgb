@@ -5,8 +5,8 @@ import Text.Printf
 import Spam
 
 -- Some sample text.
-spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
-ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
+--spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
+--ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
 
 -- spamClassificationData = SpamClassificationData spam_corpus ham_corpus
 
