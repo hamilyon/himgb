@@ -104,7 +104,7 @@ lnk txt hrf = anchor (toHtml txt) ! [href hrf]
 
 makethumb :: FilePath -> IO ()
 makethumb !file = do
-    t <- getFileType file
+    let t = getFileType file
     img <- case t of ".jpg" -> loadJpegFile file
                      ".gif" -> loadGifFile  file
                      ".png" -> loadPngFile  file
@@ -141,9 +141,9 @@ howmanyposts hst idx =
     let thd = head $ filter (\th -> eyde th == read idx) (threads hst)
     in length (posts thd)
 
-getFileType :: String -> IO String
+getFileType :: String -> String
 getFileType s = let fff = map toLower (reverse s) in
-    return $ case fff of
+    case fff of
         ('g':'e':'p':'j':_) -> ".jpg"
         ('g':'p':'j':_)     -> ".jpg"
         ('f':'i':'g':_)     -> ".gif"
@@ -186,7 +186,7 @@ imgb = do
     hst   <- (case args of 
       ("purge":_) -> return $ HState "hImgB" []
       _           -> liftM read (liftIO (hGetLine efile)))
-    ftype <- liftIO (getFileType fname)
+    let ftype = getFileType fname
     time  <- liftM show (liftIO epochTime)
 
     case null idx of
