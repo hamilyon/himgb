@@ -4,13 +4,6 @@ import Text.Printf
 
 import Spam
 
--- Some sample text.
---spam_corpus = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
---ham_corpus = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
-
--- spamClassificationData = SpamClassificationData spam_corpus ham_corpus
-
--- fullcorp = spam ++ " " ++ ham
 fullcorp spamClassificationData = crp spamClassificationData
 
 -- Return a Map representing the "Bag of Words" count of all the words in the
@@ -71,38 +64,3 @@ pmessagespam spamClassificationData message = top/bottom
                 (smooth_k spamClassificationData)) 
             $ words message
 
-{-main = do
-  -- Print out some probabilities to test.
-  putStrLn $ printf "p(spam) = %.9f" $ pspam
-  putStrLn $ printf "p(ham) = %.9f" $ pham
-  putStrLn $ printf "p(\"my\" | spam) = %.9f" $ pword spam fullcorp smoother "my"
-  putStrLn $ printf "p(\"my\" | ham) = %.9f" $ pword ham fullcorp smoother "my"
-
-  putStrLn $ printf "p(\"you\" | spam) = %.9f" $ pword spam fullcorp smoother "you"
-  putStrLn $ printf "p(\"you\" | ham) = %.9f" $ pword ham fullcorp smoother "you"
-  putStrLn $ printf "vocab %.2f" $ uniqueWords fullcorp
-
-  -- Test a message that is super spammy. Yeah, I get lots of spam that looks like this.
-  let message = "your generosity many thanks i want to convey your artwork"
-
-  putStrLn $ printf ("Message: \"" ++ message ++ "\"")
-  putStrLn $ printf "Spam probability: %.9f" $ pmessagespam message
-
-  -- Test something that's kind of nonsensical but is probably not spam.
-  let message = "i would guess wayne coyne look like a pirate"
-  putStrLn $ printf ("Message: \"" ++ message ++ "\"") 
-  putStrLn $ printf "Spam probability: %.9f" $ pmessagespam message -}
-  
-
--- $ runhaskell spamfilter.hs
--- p(spam) = 0.431034480
--- p(ham) = 0.568965500
--- p("my" | spam) = 0.026666667
--- p("my" | ham) = 0.021459227
--- p("you" | spam) = 0.022222223
--- p("you" | ham) = 0.030042918
--- vocab 41.00
--- Message: "your generosity many thanks i want to convey your artwork"
--- Spam probability: 0.716469300
--- Message: "i would guess wayne coyne look like a pirate"
--- Spam probability: 0.194385620

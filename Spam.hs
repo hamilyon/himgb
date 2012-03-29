@@ -16,8 +16,7 @@ data SpamClassificationData = SpamClassificationData {
 
 crp spamClassificationData = spam spamClassificationData ++ " " ++ ham spamClassificationData
 
--- showSpam :: SpamExample -> String
--- showSpam spamExample = spam $ spamClassificationData spamExample
+relevant = ham
+not_relevent = spam
 
--- prop_eq xs = spamProb xs == pmessagespam xs
 
