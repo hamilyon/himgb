@@ -1,5 +1,4 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
--- See <http://www.randomhacks.net/articles/2007/02/22/bayes-rule-and-drug-tests>.
 
 module Prob1
  where

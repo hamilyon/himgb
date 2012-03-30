@@ -6,7 +6,7 @@ import Spam
 data HiperText = 
     HiperText {
         childs :: [(HiperText, String)],
-        effectiveAttr :: HiperTextAttr
+        effectiveAttr :: Maybe HiperTextAttr
     }
 
 data HiperTextAttr = 
@@ -19,5 +19,7 @@ data HiperTextStyle = HiperTextStyle (String, String) -- key-value
 data HiperTextHref = HiperTextHref (String)
 
 data Stem = Stem {
-    contextTags :: Boolean
+    contextTags :: Bool
 }
+
+data Action = Cut (HiperText)
