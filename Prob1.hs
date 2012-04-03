@@ -75,6 +75,8 @@ singleWord spamClassificationData field word = nom/den
             ((fromIntegral . length . nub . words) $ crp spamClassificationData)
 
 
+SpamClassificationData -> [String] -> Double
+classify classificator message = undefined
 -- total = num +
 -- / (total + laplaceSmoother * classes)
 
