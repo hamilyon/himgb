@@ -109,7 +109,7 @@ DOM -> дерево (сигнатуры, прототип (5 *))
 толерантность (прототип +)
 обвязка :: дерево, стеммер, баесов фильтр -> действие вырезать/оставить (прототип +)
 
-прити принтер действие вырезать/оставить -> строка (сигнатуры, прототип)
+прити принтер действие вырезать/оставить -> строка (сигнатуры +, прототип +)
 
 2) юнит-тесты
 читает с диска (тест)
@@ -125,7 +125,7 @@ DOM -> дерево отбрасывает лишнее (тест)
 
 
 3) тесты интеграционные (тоже юнит, но интересные)
-подготовка данных (3 примера, 80, 10, 10)
+подготовка данных (3 примера, 80, 10, 10) +
 (найти доп данные (6*10 минут, привести к одному виду, разделить)
 файл -> DOM (сигнатуры, тест)
 тест на разный стемминг (сигнатуры, тест)
@@ -143,11 +143,55 @@ DOM -> дерево отбрасывает лишнее (тест)
 1 (7/41)
 2 (9/47)
 3 (10/47)
-4 (still stuck on this)
+4 (11/47)
+5 (12/47)
+
+
+spam:
+
+WHAT A GREAT IDEA!&nbsp;We provide a=20
+concept that will allow anyone with sufficient work experience to obtain a =
+fully=20
+verifiable University Degree.&nbsp;Bachelors, Masters or even a=20
+Doctorate.&nbsp;For US: 1.845.709.8044Outside US:=20
++1.845.709.8044&nbsp;"Just leave your NAME & PHONE NO. (with=20
+CountryCode)" in the voicemail.&nbsp;Our staff will get back to you in=20
+next few days!
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Diso-8859-1"=
+>
+<META content=3D"MSHTML 6.00.2800.1106" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>WHAT A GREAT IDEA!<BR>&nbsp;<BR>We provide=
+ a=20
+concept that will allow anyone with sufficient work experience to obtain a =
+fully=20
+verifiable University Degree.<BR>&nbsp;<BR>Bachelors, Masters or even a=20
+Doctorate.<BR>&nbsp;<BR>For US: 1.845.709.8044<BR>Outside US:=20
++1.845.709.8044<BR>&nbsp;<BR>"Just leave your NAME & PHONE NO. (with=20
+CountryCode)" in the voicemail.<BR>&nbsp;<BR>Our staff will get back to you=
+ in=20
+next few days!</FONT></DIV></BODY></HTML>
+
+ham:
+ We present GAB, a search algorithm for hybrid P2P networks,
 
 
 
+result:
+True
 
+False
+
+шаги: 
+
+1) .lorien to plaintext (+ test 3*40)
+2) byline (10)
+3) проверить что получилось
 
 
 

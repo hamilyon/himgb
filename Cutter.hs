@@ -11,8 +11,6 @@ import Data.Maybe
 isSpamWithTolerance :: (SpamClassificationData -> [String] -> Double) -> (Double -> Bool) -> SpamClassificationData -> [String] -> Bool
 isSpamWithTolerance classificator tolerance trainingData message  = (tolerance . (classificator trainingData)) message
 
-
-
 tolerance :: Double -> Bool
 tolerance x = if x > 0.9 then True else False
 
@@ -23,14 +21,12 @@ nothingToFalse :: Maybe a -> Bool
 nothingToFalse Nothing = False
 nothingToFalse _ = True
 
-
 cutSpam :: (Stem -> String -> [String]) -> (SpamClassificationData -> [String] -> Double) -> SpamClassificationData -> HiperText -> Maybe Action
 cutSpam tokener classificator trainingData hiperText | (null . childs) hiperText            = Nothing
                                                      | (length . visibleText) hiperText < 5 = Nothing
                                                      | isSpam hiperText                     = Just (Cut hiperText)
                                                      | otherwise                            = 
-                                                            Just (Cut $ (fromChildren . spamToCut) {- $ map 
-                                                            (cutSpam' :: HiperText -> Maybe Action) -}
+                                                            Just (Cut $ (fromChildren . spamToCut)
                                                             (toChildren hiperText))
         where
         visibleText = (tokener (Stem True) . plainify) :: HiperText -> [String]
