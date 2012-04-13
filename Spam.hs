@@ -19,4 +19,4 @@ crp spamClassificationData = spam spamClassificationData ++ " " ++ ham spamClass
 relevant = ham
 not_relevent = spam
 
-
+train = SpamClassificationData
