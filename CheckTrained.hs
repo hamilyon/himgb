@@ -1,4 +1,4 @@
-module CheckTraned
+module CheckTrained
     where
 
 import ReadString
