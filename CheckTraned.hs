@@ -4,7 +4,7 @@ module CheckTraned
 import ReadString
 import Spam
 import Prob1
-import System.Directory 
+import System.Directory
 import Control.Applicative
 import Lorien
 import Stemmer
@@ -31,17 +31,17 @@ plus o1 o2 = Stats
 detectedSpamOkUnit      = Stats 0 0 1 0 0 0
 detectedHamOkUnit       = Stats 0 0 0 1 0 0
 detectedFalseSpamUnit   = Stats 0 0 0 0 1 0
-detecteFalseHamUnit     = Stats 0 0 0 0 0 1
+detectedFalseHamUnit     = Stats 0 0 0 0 0 1
 
 accumulateStats ::  (String -> Bool) ->
-                    (Integer -> Stats) -> 
-                    (Integer -> Stats) -> 
-                    [String] -> 
+                    (Stats) ->
+                    (Stats) ->
+                    [String] ->
                     Stats
 
 --accumulateStats     clasifier
---                    detectedHamOkUnit
---                    detecteFalseHamUnit  = foldr (`plus` (getstats clasifier detectedHamOkUnit detecteFalseHamUnit))
+--                    good
+--                    bad  = foldr (`plus` (getstats clasifier detectedHamOkUnit detecteFalseHamUnit))
 
 accumulateStats = undefined
 
@@ -50,11 +50,13 @@ getstats = undefined
 
 batch_size = 10
 
+dir = "../corpi/test_data/"
+
 checkTrained = do
-    spamTrainBatch <- concat <$> readLorienBatch "test_data/spam/train/"
-    hamTrainBatch  <- concat <$> readBatch "test_data/ham/train/"
-    spamTestBatch  <- concat <$> readLorienBatch "test_data/spam/test/"
-    hamTestBatch   <- concat <$> readBatch "test_data/ham/test/"
+    spamTrainBatch <- concat <$> readLorienBatch (dir ++ "spam/train/")
+    hamTrainBatch  <- concat <$> readBatch       (dir ++ "ham/train/")
+    spamTestBatch  <- readLorienBatch            (dir ++ "spam/test/")
+    hamTestBatch   <- readBatch                  (dir ++ "ham/test/")
 
     let trainedClasifier = train spamTrainBatch hamTrainBatch 1
     printTestQuality trainedClasifier spamTestBatch hamTestBatch
@@ -63,8 +65,12 @@ readLorienBatch :: FilePath -> IO [String]
 readLorienBatch path = do
     -- list dir contents
     names <- getDirectoryContents path
-    let processed = take batch_size names
+    let notHidden = filter (not . isHidden) names
+    let processed = take batch_size notHidden
     mapM ((fmap lorienToPlain) . readData) names
+    where
+        isHidden ('.':_) = True
+        isHidden _       = False
 
 readBatch :: FilePath -> IO [String]
 readBatch path = do
@@ -72,19 +78,17 @@ readBatch path = do
     let processed = take batch_size names
     mapM readData names
 
-printTestQuality :: SpamClassificationData -> String -> String -> IO()
+printTestQuality :: SpamClassificationData -> [String] -> [String] -> IO()
 printTestQuality trainedClasifier spamTestBatch hamTestBatch = do
-    (putStrLn . show) $ (accumulateStats  
-                            (isSpamWithTolerance spamProb tolerance trainedClasifier)
-                            detectedHamOkUnit 
-                            detecteFalseHamUnit 
+    (putStrLn . show) $ (accumulateStats
+                            (not . (tolerance . (spamProb trainedClasifier)))
+                            detectedHamOkUnit
+                            detectedFalseHamUnit
                             hamTestBatch)
-
-
                         `plus`
-                        (accumulateStats                             
-                            (isSpamWithTolerance spamProb tolerance trainedClasifier)
-                            detectedFalseSpamUnit 
-                            trainedClasifier 
+                        (accumulateStats
+                            (tolerance . (spamProb trainedClasifier))
+                            detectedSpamOkUnit
+                            detectedFalseSpamUnit
                             spamTestBatch)
-                      
+
