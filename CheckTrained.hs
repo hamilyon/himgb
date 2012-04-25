@@ -9,6 +9,9 @@ import Control.Applicative
 import Lorien
 import Stemmer
 import Cutter
+import Control.Monad
+import System.FilePath ((</>))
+-- import Control.DeepSeq
 
 data Stats = Stats {
     overallSpam:: Integer,
@@ -48,35 +51,59 @@ accumulateStats = undefined
 getstats :: (String -> Bool) -> (Integer -> Stats) -> (Integer -> Stats) -> String -> Stats
 getstats = undefined
 
-batch_size = 10
+batch_size :: Int
+batch_size = 10 :: Int
 
 dir = "../corpi/test_data/"
 
 checkTrained = do
     spamTrainBatch <- concat <$> readLorienBatch (dir ++ "spam/train/")
-    hamTrainBatch  <- concat <$> readBatch       (dir ++ "ham/train/")
+    hamTrainBatch  <- concat <$> readBatch       (dir ++ "ham/train.txt")
     spamTestBatch  <- readLorienBatch            (dir ++ "spam/test/")
     hamTestBatch   <- readBatch                  (dir ++ "ham/test/")
 
     let trainedClasifier = train spamTrainBatch hamTrainBatch 1
     printTestQuality trainedClasifier spamTestBatch hamTestBatch
 
-readLorienBatch :: FilePath -> IO [String]
-readLorienBatch path = do
-    -- list dir contents
-    names <- getDirectoryContents path
-    let notHidden = filter (not . isHidden) names
-    let processed = take batch_size notHidden
-    mapM ((fmap lorienToPlain) . readData) names
-    where
-        isHidden ('.':_) = True
-        isHidden _       = False
+-- readLorienBatch :: FilePath -> IO [String]
+-- readLorienBatch path = do
+--     files <- (getBatchofFiles path batch_size) :: IO [String]
+--     lorien_files <- mapM ((fmap lorienToPlain) . readData) files
+--     return lorien_files
+
+readLorienBatch path = readBatchofFilesSkipErrors path batch_size lorienToPlain
 
 readBatch :: FilePath -> IO [String]
 readBatch path = do
-    names <- getDirectoryContents path
-    let processed = take batch_size names
-    mapM readData names
+    files <- (getBatchofFiles path batch_size) :: IO [String]
+    plain_files <- mapM readData files
+    return plain_files
+
+getBatchofFiles :: FilePath -> Int -> IO [String]
+getBatchofFiles path batch_size = (take batch_size) <$> getFiles path
+
+getFiles :: FilePath -> IO [String]
+getFiles path = (map (path </>)) <$> (filter (not . isHidden)) <$> getDirectoryContents path
+
+readBatchofFilesSkipErrors :: FilePath -> Int -> (String -> String) -> IO [String]
+readBatchofFilesSkipErrors path batch_size processor = do
+    files <- (getFiles path) :: IO [String]
+    processed_files <- mapM ((fmap processor) . readDataSkipErrors) files
+    let filteredEmpty = filter (not . null) (processed_files)
+    let batch = take batch_size filteredEmpty
+    return batch
+    -- do
+    -- allFiles <- (getFiles path) :: IO [String]
+
+
+
+readDataEmptyOnError :: FilePath -> IO (String)
+readDataEmptyOnError = 
+    undefined
+    -- catch (readData) (\_ -> return "")
+
+isHidden ('.':_) = True
+isHidden _       = False
 
 printTestQuality :: SpamClassificationData -> [String] -> [String] -> IO()
 printTestQuality trainedClasifier spamTestBatch hamTestBatch = do
