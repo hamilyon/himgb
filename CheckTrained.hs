@@ -88,8 +88,9 @@ getFiles path = (map (path </>)) <$> (filter (not . isHidden)) <$> getDirectoryC
 readBatchofFilesSkipErrors :: FilePath -> Int -> (String -> String) -> IO [String]
 readBatchofFilesSkipErrors path batch_size processor = do
     files <- (getFiles path) :: IO [String]
-    -- processed_files <- mapM ((fmap processor) . readDataSkipErrors) files
-    processed_files <- readFilesMax files batch_size
+    processed_files <- (fmap (map processor)) (readFilesMax files batch_size)
+
+    -- processed_files <- readFilesMax files batch_size
     putStr $ "ok I go"
     -- let filteredEmpty = filter (not . null) (files)
     -- let batch = take batch_size filteredEmpty
