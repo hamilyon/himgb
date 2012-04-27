@@ -11,7 +11,7 @@ import Stemmer
 import Cutter
 import Control.Monad
 import System.FilePath ((</>))
--- import Control.DeepSeq
+import Control.DeepSeq
 
 data Stats = Stats {
     overallSpam:: Integer,
@@ -88,10 +88,12 @@ getFiles path = (map (path </>)) <$> (filter (not . isHidden)) <$> getDirectoryC
 readBatchofFilesSkipErrors :: FilePath -> Int -> (String -> String) -> IO [String]
 readBatchofFilesSkipErrors path batch_size processor = do
     files <- (getFiles path) :: IO [String]
-    processed_files <- mapM ((fmap processor) . readDataSkipErrors) files
-    let filteredEmpty = filter (not . null) (processed_files)
-    let batch = take batch_size filteredEmpty
-    return batch
+    -- processed_files <- mapM ((fmap processor) . readDataSkipErrors) files
+    processed_files <- readFilesMax files batch_size
+    putStr $ "ok I go"
+    -- let filteredEmpty = filter (not . null) (files)
+    -- let batch = take batch_size filteredEmpty
+    return (processed_files)
     -- do
     -- allFiles <- (getFiles path) :: IO [String]
 
