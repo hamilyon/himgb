@@ -54,7 +54,7 @@ accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
 -- getstats = undefined
 
 batch_size :: Int
-batch_size = 10 :: Int
+batch_size = 2 :: Int
 
 dir = "../corpi/test_data/"
 

@@ -2,6 +2,7 @@ module Spam where
 import Test.QuickCheck
 import Data.List
 -- import Prob1
+import qualified Data.Map as M
 
 data SpamExample = SpamExample {
     corpus :: SpamClassificationData,
@@ -13,6 +14,7 @@ data SpamClassificationData = SpamClassificationData {
     ham :: String,
     smooth_k :: Double
 }
+
 
 crp spamClassificationData = spam spamClassificationData ++ " " ++ ham spamClassificationData
 
