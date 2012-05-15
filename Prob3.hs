@@ -5,6 +5,8 @@ module Prob3
 
 import Spam
 import Data.List
+import qualified Data.Map as Map
+
 
 spam_corpus1 = "i want to convey my passion for your generosity supporting folks that require assistance with the topic your very own"
 ham_corpus1 = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
@@ -12,9 +14,12 @@ ham_corpus1 = "based on your artwork from elementary school i would guess you dr
 train_ :: [String] -> [String] -> Integer -> SpamClassificationDict
 train_ spam ham smoother = SpamClassificationDict spamDict hamDict smoother
     where
-        spamDict = undefined
+        spamDict = Map.fromList $ zip 
+                                    corpus $
+                                    map (getWordSpamminess spam corpus smoother) corpus 
         hamDict = undefined
         smoother = undefined
+        corpus = spam ++ ham
 
 spamClassificationData1 = SpamClassificationData spam_corpus1 ham_corpus1 1
 
@@ -39,9 +44,6 @@ hamProb'  spamClassificationData s = (hamProbTotal spamClassificationData) * (pr
         spamClassificationData ham)
     (words s))
 
-
-
-
 count :: Fractional a =>  String -> [String] -> a
 count word corpus = countall $ filter (==word) corpus
 
@@ -61,10 +63,10 @@ singleWord spamClassificationData field word = nom/den
         den = ((countall . words . field) spamClassificationData) + (smooth_k spamClassificationData) *  
             ((fromIntegral . length . nub . words) $ crp spamClassificationData)
 
-
-classify :: SpamClassificationData -> [String] -> Double
-classify classificator message = undefined
--- total = num +
--- / (total + laplaceSmoother * classes)
+getWordSpamminess :: [String] -> [String] -> Double -> String -> Double
+getWordSpamminess spam corpus smooth_k word = nom/den
+  where nom = smooth_k + (count word ((spam)))
+        den = ((countall spam)) + (smooth_k) *  
+            ((fromIntegral . length . nub) corpus)
 
 -- main = show_off
