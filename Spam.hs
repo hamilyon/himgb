@@ -3,6 +3,7 @@ import Test.QuickCheck
 import Data.List
 -- import Prob1
 import qualified Data.Map as M
+import qualified Data.Set as S
 
 data SpamExample = SpamExample {
     corpus :: SpamClassificationData,
@@ -22,3 +23,9 @@ relevant = ham
 not_relevent = spam
 
 train = SpamClassificationData
+
+data SpamClassificationDict = SpamClassificationDict {
+    spamDict :: M.Map String Int,
+    hamDict :: M.Map String Int,
+    smooth_k_ :: Double
+}
