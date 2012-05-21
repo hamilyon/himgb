@@ -12,7 +12,7 @@ spam_corpus1 = "i want to convey my passion for your generosity supporting folks
 ham_corpus1 = "based on your artwork from elementary school i would guess you drew panels 1 and 4 and the camera on wayne coyne microphone you look like a pirate"
 
 train_ :: [String] -> [String] -> Integer -> SpamClassificationDict
-train_ spam ham smoother = SpamClassificationDict spamDict hamDict smoother
+train_ spam ham smoother = SpamClassificationDict spamDict hamDict smoother (countall corpus)
     where
         spamDict = Map.fromList $ zip 
                                     corpus $
@@ -21,27 +21,27 @@ train_ spam ham smoother = SpamClassificationDict spamDict hamDict smoother
         smoother = undefined
         corpus = spam ++ ham
 
-spamClassificationData1 = SpamClassificationData spam_corpus1 ham_corpus1 1
+spamClassificationData1 = train_ (words spam_corpus1) (words ham_corpus1) 1
 
 show_off = do
     putStr . show $ spamProb spamClassificationData1 "offer is very secret"
 
 --spamProb :: String -> Double
 --spamProb = undefined
-spamProb :: SpamClassificationData -> String -> Double
-spamProb spamClassificationData message = en * k :: Double where
-    en = spamProb' spamClassificationData message
-    k = 1 / ((spamProb' spamClassificationData message) + (hamProb' spamClassificationData message)) :: Double
+spamProb :: SpamClassificationDict -> String -> Double
+spamProb spamClassificationDict message = en * k :: Double where
+    en = spamProb' spamClassificationDict message
+    k = 1 / ((spamProb' spamClassificationDict message) + (hamProb' spamClassificationDict message)) :: Double
 
-spamProb' :: SpamClassificationData -> String -> Double
-spamProb' spamClassificationData s = (spamProbTotal spamClassificationData) * (product $ map
+spamProb' :: SpamClassificationDict -> String -> Double
+spamProb' spamClassificationDict s = (spamProbTotal spamClassificationDict) * (product $ map
     (singleWord
-        spamClassificationData spam)
+        spamClassificationDict spamDict)
     (words s))
 
-hamProb'  spamClassificationData s = (hamProbTotal spamClassificationData) * (product $ map
+hamProb'  spamClassificationDict s = (hamProbTotal spamClassificationDict) * (product $ map
     (singleWord
-        spamClassificationData ham)
+        spamClassificationDict hamDict)
     (words s))
 
 count :: Fractional a =>  String -> [String] -> a
@@ -50,18 +50,17 @@ count word corpus = countall $ filter (==word) corpus
 countall :: Fractional a => [String] -> a
 countall = fromIntegral . length 
 
--- THIS will be 0.5
-spamProbTotal :: SpamClassificationData -> Double
-spamProbTotal spamClassificationData = 0.5
+spamProbTotal :: SpamClassificationDict -> Double
+spamProbTotal spamClassificationDict = 0.5
 
-hamProbTotal spamClassificationData = 0.5
+hamProbTotal spamClassificationDict = 0.5
 
--- THIS WILL BE MAP LOOKUP
-singleWord :: SpamClassificationData -> (SpamClassificationData -> String) -> String -> Double
-singleWord spamClassificationData field word = nom/den
-  where nom = smooth_k spamClassificationData + (count word ((words . field) spamClassificationData))
-        den = ((countall . words . field) spamClassificationData) + (smooth_k spamClassificationData) *  
-            ((fromIntegral . length . nub . words) $ crp spamClassificationData)
+singleWord :: SpamClassificationDict -> (SpamClassificationDict -> (Map.Map String Double)) -> String -> Double
+singleWord spamClassificationDict field word = case Map.lookup word (field spamClassificationDict)
+    of {
+        Just v -> v;
+        Nothing -> defaultSpamminess spamClassificationDict
+    }
 
 getWordSpamminess :: [String] -> [String] -> Double -> String -> Double
 getWordSpamminess spam corpus smooth_k word = nom/den
@@ -69,4 +68,13 @@ getWordSpamminess spam corpus smooth_k word = nom/den
         den = ((countall spam)) + (smooth_k) *  
             ((fromIntegral . length . nub) corpus)
 
+getDefaultSpamminess corpusNubCount = 1.0 / corpusNubCount
+
+
+
+
 -- main = show_off
+
+
+
+
