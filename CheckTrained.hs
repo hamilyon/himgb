@@ -3,7 +3,7 @@ module CheckTrained
 
 import ReadString
 import Spam
-import Prob1
+import Prob3
 import System.Directory
 import Control.Applicative
 import Lorien
@@ -54,9 +54,9 @@ accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
 -- getstats = undefined
 
 batch_size :: Int
-batch_size = 2 :: Int
+batch_size = 15 :: Int
 
-dir = "../corpi/test_data/"
+dir = "../corpi/test_data/" -- ham/train.txt
 
 checkTrained = do
     spamTrainBatch <- concat <$> readLorienBatch (dir </> "spam/train/")
@@ -64,7 +64,7 @@ checkTrained = do
     spamTestBatch  <- readLorienBatch            (dir </> "spam/test/")
     hamTestBatch   <- readPlain                  (dir </> "ham/test.txt")
 
-    let trainedClasifier = train spamTrainBatch hamTrainBatch 1
+    let trainedClasifier = train_ (tokens spamTrainBatch) (tokens hamTrainBatch) 1
     printTestQuality trainedClasifier spamTestBatch (lines hamTestBatch)
 
 readLorienBatch path = readBatchofFilesSkipErrors path batch_size lorienToPlain
@@ -84,7 +84,7 @@ readBatchofFilesSkipErrors path batch_size processor = do
 isHidden ('.':_) = True
 isHidden _       = False
 
-printTestQuality :: SpamClassificationData -> [String] -> [String] -> IO()
+printTestQuality :: SpamClassificationDict -> [String] -> [String] -> IO()
 printTestQuality trainedClasifier spamTestBatch hamTestBatch = do
     (putStrLn . show) $ (accumulateStats
                             (not . (tolerance . (spamProb trainedClasifier)))

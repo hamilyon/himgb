@@ -16,7 +16,6 @@ data SpamClassificationData = SpamClassificationData {
     smooth_k :: Double
 }
 
-
 crp spamClassificationData = spam spamClassificationData ++ " " ++ ham spamClassificationData
 
 relevant = ham
@@ -29,4 +28,4 @@ data SpamClassificationDict = SpamClassificationDict {
     hamDict :: M.Map String Double,
     smooth_k_ :: Double,
     defaultSpamminess :: Double
-}
+} deriving (Read, Show)
