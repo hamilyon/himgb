@@ -1,0 +1,22 @@
+results n=40 commit 7975e4191529558ffa0cb1b7dca0e29fd79af2f5
+Stats {overallSpam = 0, overallHam = 0, detectedSpamOk = 21, detectedHamOk = 88, detectedFalseSpam = 19, detecteFalseHam = 2}
+
+
+n = 15
+*CheckTrained System.Time> System.Time.getClockTime 
+Tue May 22 08:57:15 MSD 2012
+*CheckTrained System.Time> checkTrained
+Stats {overallSpam = 0, overallHam = 0, detectedSpamOk = 10, detectedHamOk = 90, detectedFalseSpam = 5, detecteFalseHam = 0}
+*CheckTrained System.Time> System.Time.getClockTime 
+Tue May 22 09:07:35 MSD 2012 - 5 минут примерно
+
+
+-- ! trains too slow
+
+-- now trains offline
+
+(putStr =<< (show `fmap` System.Time.getClockTime))  >> 
+(putStr =<< ((take 1) . reverse . show) `fmap` loadTrained) >> 
+System.Time.getClockTime
+
+
