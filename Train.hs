@@ -6,22 +6,21 @@ module Train
 import ReadString
 import Spam
 import Prob3
-import System.Directory
-import Control.Applicative
 import Lorien
 import Stemmer
 import Cutter
 import Control.Monad
+import Control.Applicative
+import System.Directory
 import System.FilePath ((</>))
 import Control.DeepSeq
 import System.IO
-import CheckTrained
 
-saveTrained = do
-    spamTrainBatch <- concat <$> readLorienBatch (dir </> "spam/train/")
+saveTrained tokens smoother dir = do
+    spamTrainBatch <- concat <$> readLorienBatch (dir </> "spam/train/") batch_size
     hamTrainBatch  <- readPlain       (dir </> "ham/train.txt")
 
-    let trainedClasifier = train_ (tokens spamTrainBatch) (tokens hamTrainBatch) 1
+    let trainedClasifier = train_ (tokens spamTrainBatch) (tokens hamTrainBatch) smoother
 
     h <- openFile "trained.txt" WriteMode
     hSeek h AbsoluteSeek 0
@@ -34,3 +33,11 @@ loadTrained = do
     trainedClasifier <- read <$> (hGetLine h) 
     hClose h
     return trainedClasifier
+
+--- config
+
+
+batch_size :: Int
+batch_size = 15 :: Int
+
+ 

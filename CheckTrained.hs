@@ -12,6 +12,7 @@ import Cutter
 import Control.Monad
 import System.FilePath ((</>))
 import Control.DeepSeq
+import Train
 
 data Stats = Stats {
     overallSpam:: Integer,
@@ -31,10 +32,10 @@ plus o1 o2 = Stats
                 (detectedFalseSpam o1 + detectedFalseSpam o2)
                 (detecteFalseHam o1 + detecteFalseHam o2)
 
-detectedSpamOkUnit      = Stats 0 0 1 0 0 0
-detectedHamOkUnit       = Stats 0 0 0 1 0 0
-detectedFalseSpamUnit   = Stats 0 0 0 0 1 0
-detectedFalseHamUnit    = Stats 0 0 0 0 0 1
+detectedSpamOkUnit      = Stats 1 0 1 0 0 0
+detectedHamOkUnit       = Stats 0 1 0 1 0 0
+detectedFalseSpamUnit   = Stats 1 0 0 0 1 0
+detectedFalseHamUnit    = Stats 0 1 0 0 0 1
 
 nullStats               = Stats 0 0 0 0 0 0
 
@@ -52,37 +53,16 @@ accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
 
 -- getstats :: (String -> Bool) -> (Integer -> Stats) -> (Integer -> Stats) -> String -> Stats
 -- getstats = undefined
-
-batch_size :: Int
-batch_size = 15 :: Int
-
 dir = "../corpi/test_data/" -- ham/train.txt
 
 checkTrained = do
-    spamTrainBatch <- concat <$> readLorienBatch (dir </> "spam/train/")
-    hamTrainBatch  <- readPlain       (dir </> "ham/train.txt")
-    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/")
+    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") batch_size
     hamTestBatch   <- readPlain                  (dir </> "ham/test.txt")
 
-    let trainedClasifier = train_ (tokens spamTrainBatch) (tokens hamTrainBatch) 1
+    trainedClasifier <- loadTrained
     printTestQuality trainedClasifier spamTestBatch (lines hamTestBatch)
 
-readLorienBatch path = readBatchofFilesSkipErrors path batch_size lorienToPlain
 
-readPlain :: FilePath -> IO String
-readPlain = readDataSkipErrorsStrict
-
-getFiles :: FilePath -> IO [String]
-getFiles path = (map (path </>)) <$> (filter (not . isHidden)) <$> getDirectoryContents path
-
-readBatchofFilesSkipErrors :: FilePath -> Int -> (String -> String) -> IO [String]
-readBatchofFilesSkipErrors path batch_size processor = do
-    files <- (getFiles path) :: IO [String]
-    processed_files <- (fmap (map processor)) (readFilesMax files batch_size)
-    return (processed_files)
-
-isHidden ('.':_) = True
-isHidden _       = False
 
 printTestQuality :: SpamClassificationDict -> [String] -> [String] -> IO()
 printTestQuality trainedClasifier spamTestBatch hamTestBatch = do

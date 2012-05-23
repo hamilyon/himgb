@@ -4,7 +4,7 @@ module Lorien
 where
 
 import Spam
--- import ReadString
+import ReadString
 import Data.List.Split
 import Data.List
 
@@ -33,3 +33,5 @@ isSeparator _ = False
 dropSeparators :: [String] -> [String]
 dropSeparators = filter (fmap not isSeparator)
 -- dropSeparators = undefined
+
+readLorienBatch path batch_size = readBatchofFilesSkipErrors path batch_size lorienToPlain
