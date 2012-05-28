@@ -56,7 +56,7 @@ accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
 dir = "../corpi/test_data/" -- ham/train.txt
 
 checkTrained = do
-    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") batch_size
+    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") 10000
     hamTestBatch   <- readPlain                  (dir </> "ham/test.txt")
 
     trainedClasifier <- loadTrained

@@ -16,10 +16,12 @@ train_ spam ham smoother = SpamClassificationDict spamDict hamDict smoother (cou
     where
         spamDict = Map.fromList $ zip
                                     corpus $
-                                    map (getWordSpamminess spam corpus smoother) corpus 
+                                    map (getWordSpamminess spam corpus smoother
+                                         (getWordSpamminessDen spam corpus smoother)) corpus 
         hamDict = Map.fromList $ zip
                                     corpus $
-                                    map (getWordSpamminess ham corpus smoother) corpus 
+                                    map (getWordSpamminess ham corpus smoother
+                                         (getWordSpamminessDen ham corpus smoother)) corpus 
         corpus = spam ++ ham
 
 spamClassificationData1 = train_ (words spam_corpus1) (words ham_corpus1) 1
@@ -63,10 +65,11 @@ singleWord spamClassificationDict field word = case Map.lookup word (field spamC
         Nothing -> defaultSpamminess spamClassificationDict
     }
 
-getWordSpamminess :: [String] -> [String] -> Double -> String -> Double
-getWordSpamminess spam corpus smooth_k word = nom/den
+getWordSpamminess :: [String] -> [String] -> Double -> Double -> String -> Double 
+getWordSpamminess spam corpus smooth_k den word = nom/den
   where nom = smooth_k + (count word ((spam)))
-        den = ((countall spam)) + (smooth_k) *  
+
+getWordSpamminessDen spam corpus smooth_k = ((countall spam)) + (smooth_k) *  
             ((fromIntegral . length . nub) corpus)
 
 getDefaultSpamminess corpusNubCount = 1.0 / corpusNubCount
