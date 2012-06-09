@@ -23,7 +23,6 @@ saveTrained tokens smoother dir = do
     let trainedClasifier = train_ (tokens spamTrainBatch) (tokens hamTrainBatch) smoother
 
     h <- openFile "trained.txt" WriteMode
-    hSeek h AbsoluteSeek 0
     hPutStrLn h (show trainedClasifier)
     hClose h
 

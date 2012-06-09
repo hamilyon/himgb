@@ -20,4 +20,128 @@ Tue May 22 09:07:35 MSD 2012 - 5 минут примерно
 System.Time.getClockTime
 
 
-результат на 
+результат на  6c1a1f6fbaaa5a951828fcbe8661583fdb0d5623
+
+где-то за 5 секунд
+overallSpam = 1694, overallHam = 90
+detectedSpamOk = 1255, detectedHamOk = 76, detectedFalseSpam = 439, detecteFalseHam = 14 (толерантность 0.1)
+
+в целом, неуд, но не факт, что виноват алгоритм, не исключено, что это 
+примеры для обучения
+
+
+
+---- обучение на 240 строках 
+- не дождался, минут 3-5 ждал
+
+-- на 40 -ка
+
+исправил баг в измерялке - она не просила фактичесекие результаты, обучаю на разных объёмах
+
+hamilyon@coordinator:~/re/freb$ ./Measure 
+warming up
+estimating clock resolution...
+mean is 11.26505 us (80001 iterations)
+found 6196 outliers among 79999 samples (7.7%)
+  2882 (3.6%) high mild
+  3310 (4.1%) high severe
+estimating cost of a clock call...
+mean is 822.8862 ns (100 iterations)
+found 1 outliers among 100 samples (1.0%)
+
+benchmarking learn/learn 1000000
+Stack space overflow: current size 8388608 bytes.
+Use `+RTS -Ksize -RTS' to increase it.
+
+------------
+getWordSpamminess :: [String] -> Map.Map String Double -> Map.Map String Double
+getWordSpamminess   []       mapSoFar = mapSoFar
+getWordSpamminess   (x:xs)   mapSoFar = 
+        getWordSpamminess xs (Map.insertWith (+) x 1 mapSoFar)
+
+
+
+hamilyon@coordinator:~/re/freb$ ./Measure +RTS -sstderr -K100M
+./Measure +RTS -sstderr -K100M 
+warming up
+estimating clock resolution...
+mean is 10.79401 us (80001 iterations)
+found 5208 outliers among 79999 samples (6.5%)
+  2429 (3.0%) high mild
+  2778 (3.5%) high severe
+estimating cost of a clock call...
+mean is 757.5467 ns (66 iterations)
+found 11 outliers among 66 samples (16.7%)
+  1 (1.5%) low severe
+  5 (7.6%) low mild
+  3 (4.5%) high mild
+  2 (3.0%) high severe
+
+benchmarking learn/learn 10000
+collecting 100 samples, 1 iterations each, in estimated 713.6230 s
+mean: 7.315075 s, lb 7.265887 s, ub 7.364078 s, ci 0.950
+std dev: 252.9486 ms, lb 222.5831 ms, ub 289.6359 ms, ci 0.950
+  66,993,894,944 bytes allocated in the heap
+  64,594,786,776 bytes copied during GC
+     160,046,480 bytes maximum residency (386 sample(s))
+       4,495,336 bytes maximum slop
+             413 MB total memory in use (0 MB lost due to fragmentation)
+
+  Generation 0: 121608 collections,     0 parallel, 83.64s, 84.16s elapsed
+  Generation 1:   386 collections,     0 parallel, 46.21s, 60.68s elapsed
+
+  INIT  time    0.00s  (  0.00s elapsed)
+  MUT   time  579.07s  (598.22s elapsed)
+  GC    time  129.85s  (144.84s elapsed)
+  EXIT  time    0.00s  (  0.00s elapsed)
+  Total time  708.92s  (743.06s elapsed)
+
+  %GC time      18.3%  (19.5% elapsed)
+
+  Alloc rate    115,692,221 bytes per MUT second
+
+  Productivity  81.7% of total user, 77.9% of total elapsed
+
+
+25000:
+
+hamilyon@coordinator:~/re/freb$ time ./Measure 
+
+real	0m48.016s
+user	0m47.460s
+sys	0m0.330s
+
+50000:
+
+hamilyon@coordinator:~/re/freb$ time ./Measure 
+
+real	2m53.707s
+user	2m52.480s
+sys	0m0.350s
+
+50000:
+
+hamilyon@coordinator:~/re/freb$ time ./Measure 
+
+real	3m1.701s
+user	2m57.550s
+sys	0m0.420s
+
+100000:
+
+hamilyon@coordinator:~/re/freb$ time ./Measure 
+
+real	27m49.089s
+user	11m33.590s
+sys	0m0.780s
+
+
+200000:
+hamilyon@coordinator:~/re/freb$ time ./Measure 
+
+
+real	130m45.922s
+user	33m50.980s
+sys	0m1.330s
+
+

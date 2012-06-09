@@ -1,13 +1,18 @@
 module Stemmer
 where
 
-import HtmlSpam
+-- import HtmlSpam
+import Data.List.Split
+import Data.Char (toLower)
 
-stem :: Stem -> String -> String
-stem _ = id
+stem :: String -> String
+stem = map toLower
 
 tokens :: String -> [String]
-tokens = words
+tokens = (Data.List.Split.wordsBy $ not . ((flip elem) $ ['a'..'z']++['A'..'Z']))
 
-tokenize :: Stem -> String -> [String]
-tokenize x = (map (stem x)) . tokens
+tokenize :: String -> [String]
+tokenize = (map stem) . tokens
+
+defaultTokenize :: String -> [String]
+defaultTokenize = (map stem) . tokens

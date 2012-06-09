@@ -13,6 +13,7 @@ import Control.Monad
 import System.FilePath ((</>))
 import Control.DeepSeq
 import Train
+import Data.List.Split
 
 data Stats = Stats {
     overallSpam:: Integer,
@@ -34,15 +35,15 @@ plus o1 o2 = Stats
 
 detectedSpamOkUnit      = Stats 1 0 1 0 0 0
 detectedHamOkUnit       = Stats 0 1 0 1 0 0
-detectedFalseSpamUnit   = Stats 1 0 0 0 1 0
-detectedFalseHamUnit    = Stats 0 1 0 0 0 1
+detectedFalseSpamUnit   = Stats 0 1 0 0 1 0
+detectedFalseHamUnit    = Stats 1 0 0 0 0 1
 
 nullStats               = Stats 0 0 0 0 0 0
 
-accumulateStats ::  (String -> Bool) ->
+accumulateStats ::  ([String] -> Bool) ->
                     (Stats) ->
                     (Stats) ->
-                    [String] ->
+                    [[String]] ->
                     Stats
 
 accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
@@ -56,24 +57,31 @@ accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
 dir = "../corpi/test_data/" -- ham/train.txt
 
 checkTrained = do
-    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") 10000
+    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") 3500
     hamTestBatch   <- readPlain                  (dir </> "ham/test.txt")
 
     trainedClasifier <- loadTrained
-    printTestQuality trainedClasifier spamTestBatch (lines hamTestBatch)
+    let hamTestBatchGrouped = glueBy 2 (lines hamTestBatch)
 
+    printTestQuality trainedClasifier spamTestBatch hamTestBatchGrouped defaultTokenize
 
+glueBy nLines lines = map (foldr  ((++) . ((++) " ")) "") (Data.List.Split.splitEvery nLines lines)
 
-printTestQuality :: SpamClassificationDict -> [String] -> [String] -> IO()
-printTestQuality trainedClasifier spamTestBatch hamTestBatch = do
+printTestQuality :: SpamClassificationDict -> [String] -> [String] -> (String -> [String]) -> IO()
+printTestQuality trainedClasifier spamTestBatch hamTestBatch tokenizer = do
     (putStrLn . show) $ (accumulateStats
                             (not . (tolerance . (spamProb trainedClasifier)))
                             detectedHamOkUnit
-                            detectedFalseHamUnit
-                            hamTestBatch)
+                            detectedFalseSpamUnit $
+                            map tokenizer hamTestBatch)
                         `plus`
                         (accumulateStats
                             (tolerance . (spamProb trainedClasifier))
                             detectedSpamOkUnit
-                            detectedFalseSpamUnit
-                            spamTestBatch)
+                            detectedFalseHamUnit $
+                            map tokenizer spamTestBatch)
+
+checkSingle s = do
+    trainedClasifier <- loadTrained
+    let seeProb = spamProb trainedClasifier . defaultTokenize 
+    putStrLn . show $ seeProb s

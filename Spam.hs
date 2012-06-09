@@ -27,5 +27,5 @@ data SpamClassificationDict = SpamClassificationDict {
     spamDict :: M.Map String Double,
     hamDict :: M.Map String Double,
     smooth_k_ :: Double,
-    defaultSpamminess :: Double
+    nubCount :: Double
 } deriving (Read, Show)
