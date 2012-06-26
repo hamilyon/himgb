@@ -34,9 +34,9 @@ show_off = do
 --spamProb :: String -> Double
 --spamProb = undefined
 spamProb :: SpamClassificationDict -> [String] -> Double
-spamProb spamClassificationDict message = en * k :: Double where
+spamProb spamClassificationDict message = en / ik :: Double where
     en = spamProb' spamClassificationDict message
-    k = 1 / ((spamProb' spamClassificationDict message) + (hamProb' spamClassificationDict message)) :: Double
+    ik = ((spamProb' spamClassificationDict message) + (hamProb' spamClassificationDict message)) :: Double
 
 spamProb' :: SpamClassificationDict -> [String] -> Double
 spamProb' spamClassificationDict s = (spamProbTotal spamClassificationDict) * (product $ map
