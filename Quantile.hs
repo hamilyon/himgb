@@ -8,20 +8,24 @@ data Sections = Sections {
 }
 
 quantilesBp :: Sections -> [Double] -> [Double]
-quantilesBp s input = reverse (quantilesBp' s [] input)
+quantilesBp s input = belowPercentileInSortedList input s
 
-quantilesBp' :: Sections -> [Double] -> [Double] -> [Double]
-quantilesBp' (Sections []) soFar input = soFar
-quantilesBp' (Sections (x:xs)) soFar input = quantilesBp' (Sections xs ) (belowPercentileInSortedList input x : soFar) input
+belowPercentileInSortedList :: [Double] -> Sections -> [Double]
 
-belowPercentileInSortedList :: [Double] -> Double -> Double
-belowPercentileInSortedList [] percentile = 0
-belowPercentileInSortedList list percentile = list !! (indexPercentileInSortedList list percentile)
+belowPercentileInSortedList list percentile = map (list !!) (percentileToIndex list percentile)
 
-indexPercentileInSortedList list percentile = if percentile == 1 then (head . reverse) list else floor (((fromIntegral . length $ list) :: Double ) * percentile)
+toIndex :: Double -> Double -> Int
+toIndex len percentile = if percentile == 1 then (floor :: Double -> Int) (len - 1) else (floor :: Double -> Int) (len * percentile)
+
+percentileToIndex :: [Double] -> Sections -> [Int]
+percentileToIndex []    sections   = []
+percentileToIndex from  (Sections [])    = []
+percentileToIndex from sections = 
+    let len = ((fromIntegral . length $ from) :: Double ) in
+    map (toIndex len) (byPercent sections)
 
 quantiles :: [Double] -> [Double]
 quantiles [] = [0,0,0,0,0]
--- quantiles list = quantilesBp 
+
 
 
