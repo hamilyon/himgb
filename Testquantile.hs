@@ -14,21 +14,23 @@ main =
     do
         putStrLn "quickcheck start"
 --         quickCheck propSummHolds
-        quickCheck propIndexPositive
-        quickCheck ( propInBounds :: [Double] -> Property )
+        quickCheckWith myStdArgs propIndexPositive
+        quickCheckWith myStdArgs ( propInBounds :: [Double] -> Property )
         putStrLn "quickcheck end"
         counts <- runTestTT $ TestList [testEmpty, 
                                         testBelowPercentileInSortedList,
                                         testBelowHigh,
-                                        testBelowLowPercentile]
+                                        testBelowLowPercentile,
+                                        testStandart]
         putStrLn . show $ counts
 
 
 testEmpty = TestCase $ assertEqual
-    "zeros from zero input"  [0,0,0,0,0]  (quantiles [])
+    "zeros from zero input"  []  (quantiles [])
 
--- propSummHolds :: [Double] -> Bool
--- propSummHolds x =  (head $ quantilesBp (Sections [1]) x) == sum x
+testStandart = TestCase $ assertEqual
+    "standart case"  [91.0,120.0,136.0,140.0,180.0]
+        (quantiles [91, 100, 110, 120, 120, 121, 130, 135, 136, 136, 136, 137, 137, 138, 140, 151, 159, 170, 180])
 
 propIndexPositive :: [Double] -> Property
 propIndexPositive x =  forAll ratio $ \y -> all (>= 0) (percentileToIndex x $ singlePercentile y)
@@ -55,19 +57,4 @@ testComplex = TestCase $
 ratio :: Gen Double
 ratio = choose (0, 1)
 
-
-{-instance Random Sections where
-  randomR = integralRandomR
-  random = randomR (minBound, maxBound)
-
-instance Arbitrary Sections where
-    arbitrary = choose (minBound, maxBound)
-    coarbitrary = integralCoarbitrary
-
-doubleRandom (a,b) g = case randomR (c,d) g of
-                            (x,h) -> (fromIntegral x, h)
-    where (c,d) = (fromIntegral a :: Integer,
-                   fromIntegral b :: Integer)-}
-
-
-
+myStdArgs = Args Nothing 1000 5000 1000 True
