@@ -8,7 +8,7 @@ import System.Directory
 import Control.Applicative
 import Lorien
 import Stemmer
-import Cutter
+import Tolerance
 import Control.Monad
 import System.FilePath ((</>))
 import Control.DeepSeq

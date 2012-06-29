@@ -7,12 +7,10 @@ import HtmlSpam
 import Spam
 import TreeTransform
 import Data.Maybe
+import Tolerance
 
 isSpamWithTolerance :: (SpamClassificationData -> [String] -> Double) -> (Double -> Bool) -> SpamClassificationData -> [String] -> Bool
 isSpamWithTolerance classificator tolerance trainingData message  = (tolerance . (classificator trainingData)) message
-
-tolerance :: Double -> Bool
-tolerance x = if x > 0.01 then True else False
 
 filterSpam :: (Stem -> String -> [String]) -> (SpamClassificationData -> [String] -> Double) -> SpamClassificationData -> HiperText -> Bool
 filterSpam tokener classificator trainingData = (nothingToFalse . cutSpam tokener classificator trainingData)

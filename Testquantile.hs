@@ -1,3 +1,4 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
 -- Testquantile.hs
 
 module Testquantile
@@ -26,7 +27,7 @@ main =
 
 
 testEmpty = TestCase $ assertEqual
-    "zeros from zero input"  []  (quantiles [])
+    "zeros from zero input"  []  (quantiles [] :: [Double])
 
 testStandart = TestCase $ assertEqual
     "standart case"  [91.0,120.0,136.0,140.0,180.0]

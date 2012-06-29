@@ -15,6 +15,8 @@ import System.Directory
 import System.FilePath ((</>))
 import Control.DeepSeq
 import System.IO
+import Quantile
+import Data.Map (keys)
 
 saveTrained tokens smoother dir = do
     spamTrainBatch <- concat <$> readLorienBatch (dir </> "spam/train/") batch_size
@@ -23,6 +25,7 @@ saveTrained tokens smoother dir = do
     let trainedClasifier = train_ (tokens spamTrainBatch) (tokens hamTrainBatch) smoother
 
     h <- openFile "trained.txt" WriteMode
+    --putStrLn $ (show . quantiles) (map length ((keys . spamDict) trainedClasifier))
     hPutStrLn h (show trainedClasifier)
     hClose h
 
