@@ -145,3 +145,17 @@ user	33m50.980s
 sys	0m1.330s
 
 
+f2eebccae0493b11768402d4d8d1ca7e5e13b752:
+initial spam train lengths 235997
+initial ham  train lengths 239911
+spamDict : 
+quantiles = [1,4,5,8,61]
+mean = 6.13013013013013
+length = 2997
+hamDict : 
+quantiles = [1,5,7,9,21]
+mean = 6.94306778619701
+length = 4883
+
+Stats {overallSpam = 3500, overallHam = 187, detectedSpamOk = 738, detectedHamOk = 173, detectedFalseSpam = 14, detecteFalseHam = 2762}
+Stats {overallSpam = 3500, overallHam = 187, detectedSpamOk = 738, detectedHamOk = 173, detectedFalseSpam = 14, detecteFalseHam = 2762}
