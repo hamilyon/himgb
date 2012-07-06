@@ -14,6 +14,7 @@ import System.FilePath ((</>))
 import Control.DeepSeq
 import Train
 import Data.List.Split
+import Config
 
 data Stats = Stats {
     overallSpam:: Integer,
@@ -54,7 +55,6 @@ accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
 
 -- getstats :: (String -> Bool) -> (Integer -> Stats) -> (Integer -> Stats) -> String -> Stats
 -- getstats = undefined
-dir = "../corpi/test_data/" -- ham/train.txt
 
 checkTrained = do
     spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") 3500

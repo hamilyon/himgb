@@ -1,3 +1,4 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
 -- Train.hs
 
 module Train
@@ -15,8 +16,9 @@ import System.Directory
 import System.FilePath ((</>))
 import Control.DeepSeq
 import System.IO
-import Quantile
+import Quantile (quantiles, mean)
 import Data.Map (keys)
+import Config
 
 saveTrained tokens smoother dir = do
     spamTrainBatch <- concat <$> readLorienBatch (dir </> "spam/train/") batch_size
@@ -25,7 +27,6 @@ saveTrained tokens smoother dir = do
     let trainedClasifier = train_ (tokens spamTrainBatch) (tokens hamTrainBatch) smoother
 
     h <- openFile "trained.txt" WriteMode
-    --putStrLn $ (show . quantiles) (map length ((keys . spamDict) trainedClasifier))
     hPutStrLn h (show trainedClasifier)
     hClose h
 
@@ -38,8 +39,9 @@ loadTrained = do
 
 --- config
 
-
 batch_size :: Int
 batch_size = 15 :: Int
 
- 
+--- for tests
+
+smoother = 1

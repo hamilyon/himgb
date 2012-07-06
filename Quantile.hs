@@ -3,7 +3,8 @@
 
 module Quantile
 where
--- import Data.List
+
+import Data.List(sort)
 data Sections = Sections {
     byPercent :: [Double]
 }
@@ -25,8 +26,9 @@ percentileToIndex from sections =
     let len = ((fromIntegral . length $ from) :: Double ) in
     map (toIndex len) (byPercent sections)
 
-quantiles :: [a] -> [a]
-quantiles =  quantilesBp (Sections[0, 0.25, 0.5, 0.75, 1])
+quantiles :: Ord a => [a] -> [a]
+quantiles =  (quantilesBp (Sections[0, 0.25, 0.5, 0.75, 1])) . sort
 
+mean xs = sum (map fromIntegral xs) / fromIntegral (length xs)
 
 
