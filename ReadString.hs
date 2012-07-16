@@ -26,12 +26,16 @@ readDataSkipErrors fname =
 readFilesMax :: [String] -> Int -> IO [String]
 readFilesMax [] _ = return []
 readFilesMax _ 0 = return []
-readFilesMax fnames max_to_read = do
-    file <- readDataSkipErrors $ (head fnames)
-    let rest_of_files = ( readFilesMax (tail fnames) (max_to_read-1) )
-    if null file then (readFilesMax (tail fnames) max_to_read) else (fmap (++ ((:[]) file) )) rest_of_files
- -- (fmap ((:[] file) ++)) (
+readFilesMax fnames max_to_read = fmap (map snd) (readFilesMaxZip fnames max_to_read)
 
+readFilesMaxZip :: [String] -> Int -> IO [(FilePath, String)]
+readFilesMaxZip [] _ = return []
+readFilesMaxZip _ 0 = return []
+readFilesMaxZip fnames max_to_read = do
+    contents <- readDataSkipErrors $ (head fnames)
+    let file = ((head fnames),contents)
+    let rest_of_files = ( readFilesMaxZip (tail fnames) (max_to_read-1) )
+    if null . snd $ file then (readFilesMaxZip (tail fnames) max_to_read) else (fmap (++ ((:[]) file) )) rest_of_files
 
 readPlain :: FilePath -> IO String
 readPlain = readDataSkipErrorsStrict
@@ -45,9 +49,17 @@ getFiles path = (map (path </>)) <$> (filter (not . isHidden)) <$> getDirectoryC
 readBatchofFilesSkipErrors :: FilePath -> Int -> (String -> String) -> IO [String]
 readBatchofFilesSkipErrors path batch_size processor = do
     files <- (getFiles path) :: IO [String]
-    processed_files <- (fmap (map processor)) (readFilesMax files batch_size)
-    return (processed_files)
+    readListFilesSkipErrors files processor
 
 isHidden ('.':_) = True
 isHidden _       = False
 
+readListFilesSkipErrors :: [FilePath] -> (String -> String) -> IO [String]
+readListFilesSkipErrors files processor = do
+    processed_files <- (fmap (map processor)) (readFilesMax files (length files))
+    return (processed_files)
+
+readListFilesSkipErrorsZip :: [FilePath] -> (String -> String) -> IO [(FilePath, String)]
+readListFilesSkipErrorsZip files processor = (fmap (map (wrap processor))) (readFilesMaxZip files (length files))
+
+wrap = \f -> \(a,b) -> (a,f b)

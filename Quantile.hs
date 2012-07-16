@@ -31,4 +31,10 @@ quantiles =  (quantilesBp (Sections[0, 0.25, 0.5, 0.75, 1])) . sort
 
 mean xs = sum (map fromIntegral xs) / fromIntegral (length xs)
 
+-- helper
+printStats words = do
+    putStrLn $ "quantiles = " ++ (show . quantiles) (map length words)
+    putStrLn $ "mean = " ++ (show . mean) (map length words)
+    putStrLn $ "length = " ++ (show . length) words
+
 
