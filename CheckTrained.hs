@@ -16,6 +16,8 @@ import Train
 import Data.List.Split
 import Config
 import Quantile
+import GuessEnglishEnc
+import GuessEnglishEnc
 
 data Stats = Stats {
     overallSpam:: Integer,
@@ -58,13 +60,13 @@ accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
 -- getstats = undefined
 
 checkTrained = do
-    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") 3500
+    spamTestBatch  <- readLorienBatch            (dir </> "spam/test/") 1000
     hamTestBatch   <- readPlain                  (dir </> "ham/test.txt")
 
     trainedClasifier <- loadTrained
     let hamTestBatchGrouped = glueBy 2 (lines hamTestBatch)
 
-    printTestQuality trainedClasifier spamTestBatch hamTestBatchGrouped defaultTokenize
+    printTestQuality trainedClasifier (filter (fmap not isGarbage) spamTestBatch) hamTestBatchGrouped defaultTokenize
 
 glueBy nLines lines = map (foldr  ((++) . ((++) " ")) "") (Data.List.Split.splitEvery nLines lines)
 

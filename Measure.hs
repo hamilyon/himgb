@@ -29,7 +29,6 @@ train__  tokens smoother dir ntokens = do
     spamTrainBatch <- concat <$> readLorienBatch (dir </> "spam/train/") 1000
     hamTrainBatch  <- readPlain       (dir </> "ham/train.txt")
 
-    
     putStrLn $ "initial spam train lengths " ++ ((show . length) $ tokens spamTrainBatch)
     putStrLn $ "initial ham  train lengths " ++ ((show . length) $ tokens hamTrainBatch)
     
