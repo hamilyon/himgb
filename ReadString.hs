@@ -49,14 +49,14 @@ getFiles path = (map (path </>)) <$> (filter (not . isHidden)) <$> getDirectoryC
 readBatchofFilesSkipErrors :: FilePath -> Int -> (String -> String) -> IO [String]
 readBatchofFilesSkipErrors path batch_size processor = do
     files <- (getFiles path) :: IO [String]
-    readListFilesSkipErrors files processor
+    readListFilesSkipErrors files batch_size processor
 
 isHidden ('.':_) = True
 isHidden _       = False
 
-readListFilesSkipErrors :: [FilePath] -> (String -> String) -> IO [String]
-readListFilesSkipErrors files processor = do
-    processed_files <- (fmap (map processor)) (readFilesMax files (length files))
+readListFilesSkipErrors :: [FilePath] -> Int -> (String -> String) -> IO [String]
+readListFilesSkipErrors files max processor = do
+    processed_files <- (fmap (map processor)) (readFilesMax files max)
     return (processed_files)
 
 readListFilesSkipErrorsZip :: [FilePath] -> (String -> String) -> IO [(FilePath, String)]

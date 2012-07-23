@@ -62,7 +62,8 @@ findCulprits path to_find max = do
 
 findCulpritsInBatch :: SpamClassificationDict -> [FilePath] -> IO()
 findCulpritsInBatch trainedClasifier batch = do
-    spamTestBatch  <- readLorienList batch
+    unfilteredSpamFiles  <- readLorienList batch
+    let spamTestBatch = (filter (fmap not isGarbage) unfilteredSpamFiles)
     quality <- testQuality trainedClasifier spamTestBatch [] defaultTokenize
     if ( detectedFalseHam quality ) == (fromIntegral $ length batch) then printBatchInfo spamTestBatch else return ()
     where 

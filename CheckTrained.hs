@@ -5,6 +5,7 @@ import ReadString
 import Spam
 import Prob3
 import System.Directory
+import System.IO
 import Control.Applicative
 import Lorien
 import Stemmer
@@ -50,6 +51,9 @@ accumulateStats ::  ([String] -> Bool) ->
                     [[String]] ->
                     Stats
 
+summarizeStats :: Stats -> Double
+summarizeStats s = fromIntegral (detectedSpamOk s + detectedHamOk s) / fromIntegral (detectedSpamOk s + detectedHamOk s + detectedFalseSpam s + detectedFalseHam s)
+
 accumulateStats isSpam okUnit falseUnit checkMessages = foldr plus nullStats
             (map
                 ((\x -> if x then okUnit else falseUnit) . isSpam)
@@ -68,12 +72,35 @@ checkTrained = do
 
     printTestQuality trainedClasifier (filter (fmap not isGarbage) spamTestBatch) hamTestBatchGrouped defaultTokenize
 
+selfCheck :: FilePath -> Int -> FilePath -> Integer ->  (String -> [String]) -> (String -> Bool) -> Integer  ->             Handle -> IO()
+selfCheck spam nspam ham                    smoother    tokenizer               garbageFiler        testHamGroupLinesCount  h  = do
+    spamTestBatch  <- readLorienBatch            spam nspam
+    hamTestBatch   <- readPlain                  ham
+
+    let notGarbageSpam = filter garbageFiler spamTestBatch
+
+    let spamTrainBatch = notGarbageSpam
+    let hamTrainBatch = hamTestBatch
+
+    let trainedClasifier = train_ (tokens (concat spamTrainBatch))
+                                  (tokens hamTrainBatch) (fromIntegral smoother)
+
+    let hamTestBatchGrouped = glueBy (fromIntegral testHamGroupLinesCount) (lines hamTestBatch)
+
+    quality <- testQuality trainedClasifier spamTestBatch hamTestBatchGrouped tokenizer
+    
+    (hPutStrLn h) $ show $ quality
+
+
 glueBy nLines lines = map (foldr  ((++) . ((++) " ")) "") (Data.List.Split.splitEvery nLines lines)
 
 printTestQuality :: SpamClassificationDict -> [String] -> [String] -> (String -> [String]) -> IO()
-printTestQuality trainedClasifier spamTestBatch hamTestBatch tokenizer = do 
+printTestQuality = hPrintTestQuality System.IO.stdout
+
+hPrintTestQuality :: Handle -> SpamClassificationDict -> [String] -> [String] -> (String -> [String]) -> IO()
+hPrintTestQuality h trainedClasifier spamTestBatch hamTestBatch tokenizer = do 
     quality <- testQuality trainedClasifier spamTestBatch hamTestBatch tokenizer 
-    (putStrLn . show) $ quality
+    ((hPutStrLn h) . show) $ quality
 
 testQuality :: SpamClassificationDict -> [String] -> [String] -> (String -> [String]) -> IO(Stats)
 testQuality trainedClasifier spamTestBatch hamTestBatch tokenizer = do

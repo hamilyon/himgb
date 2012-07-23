@@ -1,7 +1,7 @@
 -- ProduceGuessEstimates.hs
 
-module Main
-where 
+module ProduceGuessEstimates
+where
 
 import GuessEnglishEnc
 import Config
@@ -12,7 +12,7 @@ import Control.Monad
 import qualified Data.Map as Map
 
 -- main = filesWithEnglishCorrelation (dir </> "spam/test/") 3000 0.3 typicalSpam
-main = checkEnglishCorrelation (dir </> "spam/test/") 3000 typicalSpam
+-- main = checkEnglishCorrelation (dir </> "spam/test/") 3000 typicalSpam
 
 -- main = testCulprits
 

@@ -36,7 +36,7 @@ dropSeparators = filter (fmap not isSeparator)
 
 readLorienBatch path batch_size = readBatchofFilesSkipErrors path batch_size lorienToPlain
 
-readLorienList paths = readListFilesSkipErrors paths lorienToPlain
+readLorienList paths = readListFilesSkipErrors paths (length paths) lorienToPlain
 
 readLorienListZip :: [FilePath] -> IO [(FilePath, String)]
 readLorienListZip paths = readListFilesSkipErrorsZip paths lorienToPlain
