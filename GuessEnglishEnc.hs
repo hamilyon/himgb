@@ -6,7 +6,7 @@ import Data.Map as Map
 
 -- credit for frequency goes to Charles SDudu (iwin_1 at hotmail.com)
 frequency :: (Ord a) => [a] -> Map.Map a Int
-frequency xs = foldl f Map.empty xs
+frequency xs = Prelude.foldl f Map.empty xs
     where f m x = let
                 m' = Map.insertWith (+) x 1 m
                 Just v = Map.lookup x m'
