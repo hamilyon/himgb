@@ -6,7 +6,7 @@ where
 import System.Console.CmdArgs
 
 data Options = Options
-    {report :: [FilePath]}
+    {report :: FilePath}
     deriving (Data,Typeable,Show,Eq)
     
 options = Options
@@ -20,5 +20,5 @@ options = Options
             ,"Run self-check:","  prob src --report"]
 
 
-probCmdArgsMode = cmdArgsMode options
+probCmdArgsMode = cmdArgs options
 

@@ -10,11 +10,12 @@ import System.IO
 
 
 -- main = checkTrained
+
 main = do 
-    print probCmdArgsMode
-    h <- openFile "selfCheck.txt" WriteMode
+    mode <- probCmdArgsMode
+    h <- openFile ("report.html") WriteMode
     selfCheck 
-        (dir </> "spam/test/") 5
+        (dir </> "spam/test/") 1000
         (dir </> "ham/test.txt")
         1
         defaultTokenize
@@ -22,5 +23,4 @@ main = do
         2
         h
     hClose h
-
 

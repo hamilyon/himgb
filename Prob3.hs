@@ -5,6 +5,7 @@ module Prob3
 
 import Spam
 import Data.List
+import Data.Set (fromList, toList)
 import qualified Data.Map as Map
 
 
@@ -14,16 +15,21 @@ ham_corpus1 = "based on your artwork from elementary school i would guess you dr
 train_ :: [String] -> [String] -> Double -> SpamClassificationDict
 train_ spam ham smoother = SpamClassificationDict spamDict hamDict smoother (countall corpus)
     where
+        spamCount = (getWordSpamminess spam Map.empty)
         spamDict = Map.map
-            (\summ -> (summ + smoother)/(spamDen))
-            (getWordSpamminess spam Map.empty)
-
+            (\summ -> (summ + smoother) / (spamDen)) spamCount
+        hamCount = (getWordSpamminess ham Map.empty)
         hamDict = Map.map
-            (\summ -> (summ + smoother)/(hamDen))
-            (getWordSpamminess ham Map.empty)
-        
-        spamDen = getWordSpamminessDen spam corpus smoother
-        hamDen =  getWordSpamminessDen ham corpus smoother
+            (\summ -> (summ + smoother) / (hamDen))
+            hamCount
+
+        spamKeys = Map.keys spamCount
+        hamKeys = Map.keys hamCount
+
+        nubCount = (fromIntegral . length . group . sort) (spamKeys ++ hamKeys)
+
+        spamDen = getWordSpamminessDen spam nubCount smoother
+        hamDen =  getWordSpamminessDen ham nubCount smoother
         corpus = spam ++ ham
 
 spamClassificationData1 = train_ (words spam_corpus1) (words ham_corpus1) 1
@@ -72,8 +78,7 @@ getWordSpamminess   []        mapSoFar = mapSoFar
 getWordSpamminess   ((x):(xs))   !mapSoFar = 
         getWordSpamminess xs (Map.insertWith (+) x 1 mapSoFar)
 
-getWordSpamminessDen spam corpus smooth_k = ((countall spam)) + (smooth_k) *  
-            ((fromIntegral . length . nub) corpus)
+getWordSpamminessDen spam nubCount smooth_k = ((countall spam)) + (smooth_k) * nubCount
 
 getDefaultSpamminess corpusNubCount = 1.0 / corpusNubCount
 
