@@ -1,0 +1,20 @@
+Default: &defaults
+  database: yesodhw.sqlite3
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: yesodhw_test.sqlite3
+  <<: *defaults
+
+Staging:
+  database: yesodhw_staging.sqlite3
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: yesodhw_production.sqlite3
+  poolsize: 100
+  <<: *defaults
