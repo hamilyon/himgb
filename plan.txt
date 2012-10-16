@@ -1,0 +1,70 @@
+0) vim improvements
+
+    1) rebind LH back
+    unmap L
+    unmap H
+
+    2) rebind WB back
+    unmap W
+    unmap B
+
+    3) grep for "maven" "path" and others - so java will build automaticaly
+
+1)  try build simple web app
+    1  no css, javascript, html only site. (throw away code)    1
+    2  translate html to hamlet (may be more productive
+        to work with hamlet directly)                           2
+    3  write 'create' handler                                   1
+    4  write 'done' handler                                     1
+    5  write auth code (if needed)                              1
+    6  deploy (static from warp, postgres db, todoapp.ru)       6
+
+
+
+
+2)  learn haskell to the point it would be enough to replicate anonimous 
+    vacancy page of headhunter
+    1) 'frontik' part of stack - ensure it gets whole 'session', 'xmlback'
+    'async' parts right - everyting else not nessesary. Proxying result as plus.
+    Wai is plus.
+        plan is this: 
+        0  parse xml and write somethhing from xpath (hacks may be nessesary)
+            0a) write test ensuring sesson gets parsed ok
+            0b) write code that make test pass
+        1  write async io in responce to http request
+            1a) write sequential http request handler, with 2 sources
+            1b) rewrite it using hardcore IORef's and ForkIo's
+        2  compose whole thing
+            2a) whole fuck of 'if's to ensire it fails when it fails
+            2b) whole fuck of self.doc.puts - fuck fucking optimization - 
+                we are writing throwaway code.
+        3  glue code
+
+    2) 'xslt' and 'fuchakabutsu' part of stack - optional, may be scripted
+        0  script 'xslt' and 'fuchakabutsu' things - no need to write html!
+
+    3) 'java' part of stack - use Persistent, try to use Monoids for any kind of
+    'buiseness logic' and 'security' thing
+        0  write tests for 'security' type of thing - shouldn't be so hard, 
+            since vacancy employs much less security than anything else
+        1  write test for 'buiseness logic' thing. No doubt, this is easy also.
+            writing is on the wall, all anon users see vacancy not much
+            differently (custom vacancies aside)
+        2  write code that passes all above tests. 
+        3  write whole fuckload of if's surrounding buiseness logic 
+            ensuring happy path is happy
+        4  write Persistent gets
+            4a) schema
+            4b) custom sql's
+
+        5  generate xml
+        6  write glue code
+
+    4) try render page
+        0  seven times as hard as previous standart tasks
+
+
+
+
+
+

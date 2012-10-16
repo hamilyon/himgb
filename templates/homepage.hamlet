@@ -1,5 +1,5 @@
 <h1>_{MsgHello}
-
+<a href=@{HomeR}>go home from anywhere</a>
 <ol>
   <li>Now that you have a working project you should use the #
     \<a href="http://www.yesodweb.com/book/">Yesod book</a> to learn more. #
