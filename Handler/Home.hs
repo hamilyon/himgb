@@ -19,6 +19,7 @@ getHomeR = do
         aDomId <- lift newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
+        where tasks = [] :: [] String
 
 postHomeR :: Handler RepHtml
 postHomeR = do
@@ -32,8 +33,11 @@ postHomeR = do
         aDomId <- lift newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
+        where tasks = [] :: [] String
+
+text = id
 
 sampleForm :: Form (FileInfo, Text)
 sampleForm = renderDivs $ (,)
     <$> fileAFormReq "Choose a file"
-    <*> areq textField "What's on the file?" Nothing
+    <*> areq boolField
