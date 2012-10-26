@@ -12,32 +12,76 @@ import Import
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler RepHtml
 getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
+    (formWidget, formEnctype) <- generateFormPost (doneForm 1)
     let submission = Nothing :: Maybe (FileInfo, Text)
         handlerName = "getHomeR" :: Text
     defaultLayout $ do
-        aDomId <- lift newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
         where tasks = [] :: [] String
 
 postHomeR :: Handler RepHtml
 postHomeR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
+    {-(formWidget, formEnctype) <- generateFormPost (doneForm 1)-}
+    ((result, formWidget), formEnctype) <- runFormPost (doneForm 1)
     let handlerName = "postHomeR" :: Text
         submission = case result of
             FormSuccess res -> Just res
             _ -> Nothing
-
     defaultLayout $ do
-        aDomId <- lift newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
         where tasks = [] :: [] String
 
 text = id
+taskTaskId x = 1
 
-sampleForm :: Form (FileInfo, Text)
+doneForm :: Integer -> Form (String, Bool)
+doneForm taskId = renderDivs $ (,)
+    <$> areq hiddenField "" (Just (show taskId))
+    <*> areq checkBoxField "Done?" (Just True)
+
+sampleForm :: Form (String, Bool)
 sampleForm = renderDivs $ (,)
-    <$> fileAFormReq "Choose a file"
-    <*> areq boolField
+    <$> areq hiddenField "" (Just "1")
+    <*> areq checkBoxField "Done?" (Just True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

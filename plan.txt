@@ -9,6 +9,7 @@
     unmap B
 
     3) grep for "maven" "path" and others - so java will build automaticaly
+ok
 
 1)  try build simple web app
     1  no css, javascript, html only site. (throw away code)    1

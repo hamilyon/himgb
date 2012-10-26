@@ -10,15 +10,15 @@ $# Comments:
     <a href=@{HomeR}>go home from anywhere</a>
     <ol>
         $if null tasks
-            <li> There are no tasks, so create some!
+            <div class='main_page_empty_task_notification> There are no tasks, so create some!
         $else
             $forall task <- tasks
-                <li> #{(text task)}
+              <li #form>
+                  <form method=post action=@{HomeR}#rm enctype=#{formEnctype}>
+                    ^{formWidget}#{(text task)}
+                    <input type="submit" value="Send it!">
+                <li>
 
-      <li ##{aDomId}>If you had javascript enabled then you wouldn't be seeing this.
-        
-      <li #form>
-          <form method=post action=@{HomeR}#form enctype=#{formEnctype}>
-            ^{formWidget}
-            <input type="submit" value="Send it!">
+      <li #something>
+
 
