@@ -15,10 +15,5 @@ $# Comments:
             $forall task <- tasks
               <li #form>
                   <form method=post action=@{HomeR}#rm enctype=#{formEnctype}>
-                    ^{formWidget}#{(text task)}
-                    <input type="submit" value="Send it!">
-                <li>
-
-      <li #something>
-
-
+                     ^{formWidget}#{(text task)}
+                     <input type="submit" value="Send it!">

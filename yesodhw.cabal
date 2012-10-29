@@ -29,6 +29,7 @@ library
                      Settings.StaticFiles
                      Settings.Development
                      Handler.Home
+                     Handler.Models
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
