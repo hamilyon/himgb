@@ -13,7 +13,15 @@ $# Comments:
             <div class='main_page_empty_task_notification> There are no tasks, so create some!
         $else
             $forall task <- tasks
-              <li #form>
-                  <form method=post action=@{HomeR}#rm enctype=#{formEnctype}>
-                     ^{formWidget}#{(text task)}
-                     <input type="submit" value="Send it!">
+        $if null forms
+            <div> error!
+        $else
+            $forall triple <- all
+                $with form <- triple
+                  <li #form>
+                    $with formWidget <- fs form
+                        $with formEnctype <- sn form
+                            <form method=post action=@{HomeR}#rm enctype=#{formEnctype}>
+                               ^{formWidget}
+                                <div>#{text $ thd triple}
+                               <input type="submit" value="Send it!">
