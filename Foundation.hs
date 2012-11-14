@@ -126,7 +126,7 @@ instance YesodPersist App where
             (connPool master)
 
 instance YesodAuth App where
-    type AuthId App = UserId
+    type AuthId App = ClientIdentityId
 
     -- Where to send a user after successful login
     loginDest _ = HomeR
@@ -134,11 +134,11 @@ instance YesodAuth App where
     logoutDest _ = HomeR
 
     getAuthId creds = runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
+        x <- getBy $ UniqueSecurityToken $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing -> do
-                fmap Just $ insert $ User (credsIdent creds) Nothing
+                fmap Just $ insert $ ClientIdentity (credsIdent creds) Nothing
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authBrowserId, authGoogleEmail]

@@ -1,11 +1,22 @@
+ClientIdentity
+    securityToken Text
+    user UserId Maybe
+    UniqueSecurityToken securityToken
+
 User
-    ident Text
-    password Text Maybe
-    UniqueUser ident
+    userName Text
+    password Text
+    UniqueUserName userName
+
 Email
     email Text
     user UserId Maybe
     verkey Text Maybe
     UniqueEmail email
+
+Task
+    user ClientIdentityId
+    text String
+    done Bool
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

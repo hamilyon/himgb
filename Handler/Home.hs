@@ -1,8 +1,8 @@
 {-# LANGUAGE TupleSections, OverloadedStrings #-}
 module Handler.Home where
+import Database.Persist.GenericSql (runSqlConn, runMigration, SqlPersist)
 
 import Import
-import Handler.Models
 
 prip :: (a,b) -> c -> (a,b,c)
 prip (a,b) c = (a,b,c)
@@ -40,13 +40,22 @@ postHomeR = do
         {-setTitle "Welcome To Yesod!"-}
         {-$(widgetFile "homepage")-}
 
-tasks :: [Task]
-tasks = [Task 1 "Написать на yesod todo app" False,
-         Task 2 "Почитать hacker news" True]
+client :: ClientIdentityId
+client = undefined
 
-doneForm :: Task -> Form Task
-doneForm task = renderDivs $ Task
-    <$> areq hiddenField "" (Just (tId task))
+data TaskFormData = TaskFormData {
+  tId :: String,
+  text :: String,
+  done :: Bool
+}
+
+tasks :: [TaskFormData]
+tasks = [TaskFormData 1 "Написать на yesod todo app" False,
+         TaskFormData 2 "Почитать hacker news" True]
+
+doneForm :: TaskFormData -> Form TaskFormData
+doneForm task = renderDivs $ TaskFormData
+    <$> areq hiddenField "" (Just (tid task))
     <*> areq hiddenField "" (Just (text task))
     <*> areq checkBoxField "" (Just (done task))
 

@@ -7,7 +7,6 @@ $# Comments:
 
 
     <h1>_{MsgHello}
-    <a href=@{HomeR}>go home from anywhere</a>
     <ol>
         $if null tasks
             <div class='main_page_empty_task_notification> There are no tasks, so create some!
