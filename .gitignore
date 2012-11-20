@@ -3,3 +3,7 @@
 *.o
 *.hi
 dist/build
+dist/package.conf.inplace
+dist/setup-config
+*.sqlite3
+*.db

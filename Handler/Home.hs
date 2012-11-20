@@ -50,12 +50,12 @@ data TaskFormData = TaskFormData {
 }
 
 tasks :: [TaskFormData]
-tasks = [TaskFormData 1 "Написать на yesod todo app" False,
-         TaskFormData 2 "Почитать hacker news" True]
+tasks = [TaskFormData "1" "Написать на yesod todo app" False,
+         TaskFormData "2" "Почитать hacker news" True]
 
 doneForm :: TaskFormData -> Form TaskFormData
 doneForm task = renderDivs $ TaskFormData
-    <$> areq hiddenField "" (Just (tid task))
+    <$> areq hiddenField "" (Just (tId task))
     <*> areq hiddenField "" (Just (text task))
     <*> areq checkBoxField "" (Just (done task))
 
