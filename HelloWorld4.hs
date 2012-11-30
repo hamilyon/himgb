@@ -2,6 +2,7 @@
 {-# LANGUAGE TemplateHaskell, OverloadedStrings, GADTs, MultiParamTypeClasses #-}
 import Yesod
 import Database.Persist.Sqlite
+import Database.Persist.Store
 
 -- Define our entities as usual
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persist|
@@ -49,4 +50,5 @@ main :: IO ()
 main = withSqlitePool "test.db3" openConnectionCount $ \pool -> do
     runSqlPool (runMigration migrateAll) pool
     runSqlPool (insert $ Person "Michael" "Snoyman" 26) pool
-    warpDebug 3000 $ PersistTest pool
+    runSqlPool (delete $ ((Key $ PersistInt64 1) :: PersonId)) pool
+    {-warpDebug 31000 $ PersistTest pool-}
