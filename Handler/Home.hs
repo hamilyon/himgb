@@ -26,7 +26,7 @@ getHomeR = do
 
     mauth <- maybeAuth
     let userId = case mauth of
-            Nothing -> (Key $ PersistText "1" :: ClientIdentityId)
+            Nothing -> (fakeClientIdentity )
             Just (Entity clientIdentityId clientIdentity) -> clientIdentityId
 
     {-taskEntId <- runDB $ insert $ Task userId "what" False-}
@@ -41,15 +41,26 @@ getHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
+fakeClientIdentity :: ClientIdentityId
+fakeClientIdentity = Key $ PersistText "1"
 
 postHomeR :: Handler RepHtml
 postHomeR = do
+    resultWidgetEnctype  <- runFormPost (defaultDoneForm Nothing Nothing Nothing)
+    let ((formResult, _), _) = resultWidgetEnctype
+    case formResult of
+        FormSuccess taskFormData -> do
+            liftIO $ print $ tId taskFormData
+            runDB $ insert $ fromTaskFormData taskFormData
+            setMessageI $ MsgTaskCreated
+            redirect $ HomeR
+            {-$ text taskFormData-}
+        _ -> defaultLayout $ do
+            setTitleI MsgTaskNotValid
     defaultLayout $ do
         setTitle "Welcome To Yesod!"
         $(widgetFile "stub")
-    {-[>(formWidget, formEnctype) <- generateFormPost (doneForm 1)<]-}
     {-let forms = doneForm `fmap` tasks-}
-    {-widgetAndEnctypes <- mapM runFormPost forms-}
     {-let results = map (fst. fst) widgetAndEnctypes-}
     {-let result = results !! 0-}
     {-let handlerName = "postHomeR" :: Text-}
@@ -60,6 +71,8 @@ postHomeR = do
         {-setTitle "Welcome To Yesod!"-}
         {-$(widgetFile "homepage")-}
 
+fromTaskFormData :: TaskFormData -> Task
+fromTaskFormData (TaskFormData u t d) = Task fakeClientIdentity (unpack t) d
 client :: ClientIdentityId
 client = undefined
 
@@ -77,11 +90,17 @@ toTaskFormData :: Task -> TaskFormData
 toTaskFormData (Task user text_ done_) = TaskFormData (show $ unKey user) (pack $ text_) done_
 
 doneForm :: Entity Task -> Form TaskFormData
-doneForm taskEntity = renderDivs $ TaskFormData
-    <$> areq hiddenField "" (Just (show $ unKey $ entityKey $ taskEntity))
-    <*> areq textField (FieldSettings "" Nothing Nothing Nothing [("a","b")]) (Just (pack $ taskText task))
-    <*> areq checkBoxField "" (Just (taskDone task))
+doneForm taskEntity =  defaultDoneForm
+        (Just (show $ unKey $ entityKey $ taskEntity))
+        (Just (pack $ taskText task))
+        (Just (taskDone task))
     where task = entityVal taskEntity
+
+defaultDoneForm :: Maybe String -> Maybe Text -> Maybe Bool -> Form TaskFormData
+defaultDoneForm id text done = renderDivs $ TaskFormData
+    <$> areq hiddenField "" id
+    <*> areq textField (FieldSettings "" Nothing Nothing Nothing [("a","b")]) text
+    <*> areq checkBoxField "" done
 
 
 
