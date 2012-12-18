@@ -75,6 +75,13 @@ type Form x = Html -> MForm App App (FormResult x, Widget)
 instance Yesod App where
     approot = ApprootMaster $ appRoot . settings
 
+    isAuthorized HomeR True = do
+        mauth <- maybeAuth
+        case mauth of
+            Nothing -> return AuthenticationRequired
+            Just (Entity clientIdentityId clientIdentity) -> return Authorized
+    isAuthorized _ _ = return Authorized
+
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
     makeSessionBackend _ = do

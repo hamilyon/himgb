@@ -73,8 +73,6 @@ postHomeR = do
 
 fromTaskFormData :: TaskFormData -> Task
 fromTaskFormData (TaskFormData u t d) = Task fakeClientIdentity (unpack t) d
-client :: ClientIdentityId
-client = undefined
 
 data TaskFormData = TaskFormData {
   tId :: String,
@@ -91,7 +89,7 @@ toTaskFormData (Task user text_ done_) = TaskFormData (show $ unKey user) (pack 
 
 doneForm :: Entity Task -> Form TaskFormData
 doneForm taskEntity =  defaultDoneForm
-        (Just (show $ unKey $ entityKey $ taskEntity))
+        (Just (unpack $ toPathPiece $ unKey $ entityKey $ taskEntity))
         (Just (pack $ taskText task))
         (Just (taskDone task))
     where task = entityVal taskEntity
