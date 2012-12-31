@@ -98,11 +98,44 @@ prepareData fileName chunk = do
         toDouble x = fromRational x :: Double
 
 generateGuess :: RwGraph -> [Int]  -> IO [Int]
-generateGuess g knownVector = return result 
-    where result = iterativeProduceWith (\g v -> map (produce v) (catMaybes (map (look g) v))) 0.85 (incidence g) knownVector 20 
-                where 
+generateGuess g knownVector = return result
+    where result = iterativeProduceWith
+                    (dotProduce)
+                    0.85
+                    (incidence g)
+                    (toStachastic knownVector) 20
+                    0.05
+                    where
                         iterativeProduceWith = u
-                        produce = u
+
+iterativeProduceWith :: ( Map Int (Map Int Double) -> [(Int, Double)] -> [(Int, Double)]) ->
+                        Double ->
+                        Map Int (Map Int Double) ->
+                        [(Int, Double)] ->
+                        [(Int, Double)] ->
+                        Int ->
+                        Double ->
+                        [Int]
+iterativeProduceWith dotProduce alpha g knownVector currentVector 0 threshhold = 
+                    ((map fst) . (filter (\(x,d) -> d >= threshhold))) currentVector
+iterativeProduceWith dotProduce alpha g knownVector currentVector nIterations threshhold = 
+                    iterativeProduceWith dotProduce alpha g knownVector newVector (nIterations - 1) threshhold
+                    where
+                        newVector = ()
+
+dotProduce :: Map Int (Map Int Double) -> [(Int, Double)] -> [(Int, Double)]
+dotProduce g v = foldl 0 (plusVector) $ map (columnProduce) v
+
+columnProduce :: Map Int (Map Int Double) -> (Int, Double) -> [(Int, Double)]
+columnProduce g (x, d) = case (look g x >>= (scalarProduce . toList)) of
+                            Nothing -> []
+                            Just v -> v
+
+plusVector :: [(Int, Double)] -> [(Int, Double)] -> [(Int, Double)]
+plusVector a b = toList (fromListWith (+) (concat [a, b]))
+
+scalarProduce :: Double -> [(Int, Double)]-> [(Int, Double)]
+scalarProduce d = (map (\(x, e) -> (x, e * d))
 
 validate :: IO(Float,Float)
 validate = do
