@@ -71,8 +71,8 @@ randomGraph size stdGen =
 prepareTrainData  =  prepareData "./hand_execution.txt" 3
 prepareTestData   =  return $ toStachastic [1,2,3]
 
-toStachastic :: [Int] -> Map Int Double
-toStachastic l = fromList $ map (\x -> (x, m)) l
+toStachastic :: [Int] -> [(Int, Double)]
+toStachastic l = map (\x -> (x, m)) l
                 where m = (1.0 / (fromIntegral $ length l) :: Double)
 
 -- TODO: generate clustered graph
@@ -103,10 +103,12 @@ generateGuess g knownVector = return result
                     (dotProduce)
                     0.85
                     (incidence g)
-                    (toStachastic knownVector) 20
+                    kV
+                    kV
+                    20
                     0.05
-                    where
-                        iterativeProduceWith = u
+                    where 
+                        kV = (toStachastic knownVector)
 
 iterativeProduceWith :: ( Map Int (Map Int Double) -> [(Int, Double)] -> [(Int, Double)]) ->
                         Double ->
@@ -121,7 +123,7 @@ iterativeProduceWith dotProduce alpha g knownVector currentVector 0 threshhold =
 iterativeProduceWith dotProduce alpha g knownVector currentVector nIterations threshhold = 
                     iterativeProduceWith dotProduce alpha g knownVector newVector (nIterations - 1) threshhold
                     where
-                        newVector = (dotProduce g currentVector)
+                        newVector = scalarProduce alpha (dotProduce g currentVector) `plusVector` scalarProduce (1 - alpha) knownVector
 
 dotProduce :: Map Int (Map Int Double) -> [(Int, Double)] -> [(Int, Double)]
 dotProduce g v = foldl (plusVector) [] $ map (columnProduce g) v
