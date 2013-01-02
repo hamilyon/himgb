@@ -1,7 +1,9 @@
 import Data.List.Split
 import System.Random
 import Data.Map (adjust, unionWith, fromListWith, Map, lookup, keys, fromList, singleton, toList)
-import Data.Set (union, Set)
+
+import Data.Set (union, Set, intersection)
+import qualified Data.Set as S (fromList, size)
 import Data.Maybe (catMaybes)
 import Criterion.Main (defaultMain, bench, whnf, bgroup)
 
@@ -69,7 +71,7 @@ randomGraph size stdGen =
         fromListOf2Lists = (fromListWith (unionWith (+))) . (Prelude.map toTupleSet)
 
 prepareTrainData  =  prepareData "./hand_execution.txt" 3
-prepareTestData   =  return $ toStachastic [1,2,3]
+prepareTestData   =  return [1,2,3]
 
 toStachastic :: [Int] -> [(Int, Double)]
 toStachastic l = map (\x -> (x, m)) l
@@ -146,12 +148,18 @@ validate = do
     trainData <- prepareTrainData
     testData <- prepareTestData
     guess <- generateGuess (toGraph trainData) [5]
-    etalon <- generateEtalon trainData
+    etalon <- generateEtalon testData
     result <- computeQualityMetric etalon guess
     return (0,0)
         where
-              computeQualityMetric = u
               generateEtalon = return . id
+
+computeQualityMetric :: [Int] -> [Int] -> IO (Double, Double)
+computeQualityMetric etalon guess = return (correctness, completeness)
+    where
+        correctness = fromIntegral correctResults / fromIntegral (length guess)
+        completeness = fromIntegral correctResults / fromIntegral (length etalon)
+        correctResults = S.size $ intersection (S.fromList etalon) (S.fromList guess)
 
 toTupleSet [a,b] = (a, fromList [(b,1)] )
 toTupleSet _ = error "only lists of length 2 supported"
