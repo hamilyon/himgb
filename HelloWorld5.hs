@@ -1,6 +1,6 @@
 import Data.List.Split
 import System.Random
-import Data.Map (adjust, unionWith, fromListWith, Map, lookup, keys, fromList, singleton)
+import Data.Map (adjust, unionWith, fromListWith, Map, lookup, keys, fromList, singleton, toList)
 import Data.Set (union, Set)
 import Data.Maybe (catMaybes)
 import Criterion.Main (defaultMain, bench, whnf, bgroup)
@@ -121,23 +121,25 @@ iterativeProduceWith dotProduce alpha g knownVector currentVector 0 threshhold =
 iterativeProduceWith dotProduce alpha g knownVector currentVector nIterations threshhold = 
                     iterativeProduceWith dotProduce alpha g knownVector newVector (nIterations - 1) threshhold
                     where
-                        newVector = ()
+                        newVector = (dotProduce g currentVector)
 
 dotProduce :: Map Int (Map Int Double) -> [(Int, Double)] -> [(Int, Double)]
-dotProduce g v = foldl 0 (plusVector) $ map (columnProduce) v
+dotProduce g v = foldl (plusVector) [] $ map (columnProduce g) v
 
 columnProduce :: Map Int (Map Int Double) -> (Int, Double) -> [(Int, Double)]
-columnProduce g (x, d) = case (look g x >>= (scalarProduce . toList)) of
+columnProduce g (x, d) = case (look g x `mapf` (scalarProduce d . toList)) of
                             Nothing -> []
                             Just v -> v
+
+mapf = flip fmap
 
 plusVector :: [(Int, Double)] -> [(Int, Double)] -> [(Int, Double)]
 plusVector a b = toList (fromListWith (+) (concat [a, b]))
 
 scalarProduce :: Double -> [(Int, Double)]-> [(Int, Double)]
-scalarProduce d = (map (\(x, e) -> (x, e * d))
+scalarProduce d = map (\(x, e) -> (x, e * d))
 
-validate :: IO(Float,Float)
+validate :: IO (Float,Float)
 validate = do
     trainData <- prepareTrainData
     testData <- prepareTestData
