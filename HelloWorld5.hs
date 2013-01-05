@@ -16,7 +16,7 @@ u = undefined
 rev = u
 
 data RwGraph = RwGraph {
-    incidence :: Map Int (Map Int Double)
+    transposed :: Map Int (Map Int Double)
     {-transposed :: Map Int (Set Int)-}
 } deriving Show
 -- import qualified Data.Vector.Random.Mersenne as G
@@ -28,17 +28,21 @@ bmain = defaultMain [
             , bench "14000000/500/3" $ whnf rev [1..30000]
             ]
         ]
-
-main :: IO ()
-main =  do
+rmain = do
     let g = randomGraph 100 (mkStdGen 359353)
 
     print $ show $ g
     print $ show $ singleRandomWalk g (mkStdGen 100) 1 2 (\_ -> True)
 
+main :: IO ()
+main =  do
+    results <- validate
+    print $ show $ results
+
+
 randomWalksBench :: Int -> Int -> Int -> [Int]
 randomWalksBench 0 _ _ = error "trying to simulate 0-sized graph"
-randomWalksBench gSize nWalkers nSteps = randomWalks g (mkStdGen 100) (((foldl1 min) . keys . incidence) g) nSteps (\_ -> True) nWalkers
+randomWalksBench gSize nWalkers nSteps = randomWalks g (mkStdGen 100) (((foldl1 min) . keys . transposed) g) nSteps (\_ -> True) nWalkers
                                             where g = randomGraph gSize (mkStdGen 100)
 
 randomWalks :: RwGraph -> StdGen -> Int -> Int -> (Int -> Bool) -> Int -> [Int]
@@ -53,7 +57,7 @@ singleRandomWalk graph stdGen            start  0        isFinish = (stdGen, sta
 singleRandomWalk graph stdGen            start  minSteps isFinish =
     singleRandomWalk graph newGen newStart (minSteps - 1) isFinish
     where
-        newStart = case Data.Map.lookup start (incidence graph) of
+        newStart = case Data.Map.lookup start (transposed graph) of
                     Nothing -> start
                     Just newPos -> list !! index
                         where
@@ -70,8 +74,10 @@ randomGraph size stdGen =
         approxNumberOfNodes  = (ceiling . (** 0.5) . (* 7)) (fromIntegral size) :: Int
         fromListOf2Lists = (fromListWith (unionWith (+))) . (Prelude.map toTupleSet)
 
+fromListWithSum = fromListWith (unionWith (+))
+
 prepareTrainData  =  prepareData "./hand_execution.txt" 3
-prepareTestData   =  return [1,2,3]
+prepareTestData   =  return [2,5,6]
 
 toStachastic :: [Int] -> [(Int, Double)]
 toStachastic l = map (\x -> (x, m)) l
@@ -88,9 +94,9 @@ prepareData :: String -> Int -> IO([(Int,Int,Double)])
 prepareData fileName chunk = do
     file <- readFile fileName
 
-    let split = Data.List.Split.wordsBy (\c -> not $ elem c "1234567890%,") ((splitOn "---" file ) !! chunk)
+    let split = Data.List.Split.wordsBy (\c -> not $ elem c "1234567890%") ((splitOn "---" file ) !! chunk)
     let by3s = chunksOf 3 split
-    let typed = map ((\(x,y,z) -> (r x,r y,readDouble z)) . toTuple) by3s
+    let typed = map ((\(x,y,z) -> (r y,r x,readDouble z)) . toTuple) by3s
     return typed
     where
         r = read :: String -> Int
@@ -104,13 +110,14 @@ generateGuess g knownVector = return result
     where result = iterativeProduceWith
                     (dotProduce)
                     0.85
-                    (incidence g)
+                    (transposed g)
                     kV
-                    kV
+                    (toStachastic [1..dimensions])
                     20
-                    0.05
+                    (1 / fromIntegral dimensions)
                     where 
                         kV = (toStachastic knownVector)
+                        dimensions = foldl max 0 (keys (transposed g)) :: Int
 
 iterativeProduceWith :: ( Map Int (Map Int Double) -> [(Int, Double)] -> [(Int, Double)]) ->
                         Double ->
@@ -120,6 +127,7 @@ iterativeProduceWith :: ( Map Int (Map Int Double) -> [(Int, Double)] -> [(Int, 
                         Int ->
                         Double ->
                         [Int]
+
 iterativeProduceWith dotProduce alpha g knownVector currentVector 0 threshhold = 
                     ((map fst) . (filter (\(x,d) -> d >= threshhold))) currentVector
 iterativeProduceWith dotProduce alpha g knownVector currentVector nIterations threshhold = 
@@ -143,14 +151,15 @@ plusVector a b = toList (fromListWith (+) (concat [a, b]))
 scalarProduce :: Double -> [(Int, Double)]-> [(Int, Double)]
 scalarProduce d = map (\(x, e) -> (x, e * d))
 
-validate :: IO (Float,Float)
+validate :: IO (Double,Double)
 validate = do
     trainData <- prepareTrainData
     testData <- prepareTestData
     guess <- generateGuess (toGraph trainData) [5]
+    print $ show $ guess
     etalon <- generateEtalon testData
     result <- computeQualityMetric etalon guess
-    return (0,0)
+    return result
         where
               generateEtalon = return . id
 
