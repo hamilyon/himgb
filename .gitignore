@@ -7,3 +7,7 @@ dist/package.conf.inplace
 dist/setup-config
 *.sqlite3
 *.db
+cabal-dev*
+static
+tags
+
